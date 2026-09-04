@@ -105,14 +105,18 @@ Read left to right off `configurator-interior.png`.
 
 | Surface | Treatment |
 |---|---|
-| Upper dash, door uppers, pillars | Dark charcoal `#33343a`, matte, roughness ~0.92, near-zero specular |
-| Lower fascia, door lowers, console flanks | Light greige `#b9b4a9`, satin, roughness ~0.68 |
-| Trim strips, handles, shifter ring, vent blades | Satin metal `#9ea1a4`, roughness ~0.32, metalness ~0.8 — tight highlight, not a mirror |
+| Upper dash, door uppers, pillars | Dark charcoal, matte, roughness 0.92, metalness 0.02 |
+| Lower fascia, door lowers, console flanks | Warm greige, satin, roughness 0.68 |
+| Trim strips, handles, shifter ring, vent blades | Satin metal, roughness 0.44, metalness 0.55. Satin, not chrome |
 | Screens | Near-black gloss, roughness ~0.12, faint reflection layer |
-| Seats | Dark grey fabric `#43454b`, roughness ~0.95, vertical stripe on the centre panels |
-| Stitching / piping | Orange-red `#c2542c` |
-| Carpet, footwells | Near-black `#1c1d20`, fully matte |
-| Headliner | Light warm grey `#a8a6a1` |
+| Seats | Dark grey fabric, roughness 0.95, vertical stripe on the centre panels |
+| Stitching / piping | Muted orange-red. Drawn as discrete instanced segments, not a continuous strip, or it reads as a light bar rather than thread |
+| Carpet, footwells | Near-black, fully matte |
+| Headliner | Mid warm grey |
+
+Per-trim values live in `src/cars/explorer/trims.ts`; the treatments above are the
+seven named surfaces in `src/scene/explorer/materials.ts`. Only Active is dialled in
+against the reference — the other four trims are plausible, not verified.
 
 ## Lighting
 
