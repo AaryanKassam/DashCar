@@ -4,3 +4,6 @@ dist
 *.local
 .vite
 tsconfig.tsbuildinfo
+
+# Reference imagery is Ford's — kept locally for development, never shipped
+reference/
