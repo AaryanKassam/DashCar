@@ -6,7 +6,9 @@ cannot: drive, light up, warn, navigate and watch the road for you.
 
 ![The cabin in configurator mode](docs/interior-default.png)
 
-**[Live demo](#) · [Camera](#the-camera) · [Architecture](#architecture) · [Controls](#controls)**
+**[Camera](#the-camera) · [Architecture](#architecture) · [Controls](#controls)**
+
+*Not deployed yet: `npm run dev` to run it locally.*
 
 > **Unaffiliated portfolio recreation.** This is a personal study of production
 > HMI patterns, not a Ford product, and it is not affiliated with, endorsed by,
