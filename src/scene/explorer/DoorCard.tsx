@@ -20,7 +20,7 @@ function AmbientStrip({ x, y, color }: { x: number; y: number; color: string }) 
   useFrame(() => {
     if (!ref.current) return
     const night = palette(useVehicleStore.getState().timeOfDay).nightFactor
-    ref.current.emissiveIntensity = night * 2.6
+    ref.current.emissiveIntensity = night * 1.4
   })
   return (
     <mesh position={[x, y, -0.24]}>

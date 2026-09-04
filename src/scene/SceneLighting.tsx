@@ -50,7 +50,7 @@ export function SceneLighting() {
       // Dome light. Point lights fall off with the square of distance, so the
       // numbers here are much larger than they look — at ~1.2 m from the dash
       // roughly half of this reaches the surface.
-      cabin.current.intensity = (0.7 + p.nightFactor * 1.9) * (1 - studio) + 1.1 * studio
+      cabin.current.intensity = (0.7 + p.nightFactor * 0.8) * (1 - studio) + 1.1 * studio
     }
     if (fill.current) {
       // Fill from behind the eye point, standing in for light bounced off the
@@ -60,7 +60,11 @@ export function SceneLighting() {
       ;(fill.current.color as Color).copy(p.ambientColor)
     }
     // Ambient strips are the main cabin light source after dark.
-    const strip = p.nightFactor * 1.6
+    // Ambient lighting is a glow along the door cards, not a floodlight. The
+    // first pass ran this four times higher and turned the whole cabin amber,
+    // which is the opposite of what the effect is for: you should notice the
+    // strips, not the light they throw.
+    const strip = p.nightFactor * 0.45
     if (accentA.current) accentA.current.intensity = strip
     if (accentB.current) accentB.current.intensity = strip
 
@@ -78,8 +82,8 @@ export function SceneLighting() {
       <hemisphereLight args={['#a9c8e8', '#2b241c', 0.3]} />
       <pointLight ref={cabin} position={[0, 1.72, -0.35]} distance={4} decay={2} color="#ffe6c4" intensity={2} />
       <pointLight ref={fill} position={[0, 1.35, 0.55]} distance={5} decay={2} color="#e6ecf5" intensity={3} />
-      <pointLight ref={accentA} position={[-0.85, 0.62, -0.1]} distance={1.6} decay={2} color={car.theme.ambient} intensity={0} />
-      <pointLight ref={accentB} position={[0.85, 0.62, -0.1]} distance={1.6} decay={2} color={car.theme.ambient} intensity={0} />
+      <pointLight ref={accentA} position={[-0.85, 0.62, -0.1]} distance={1.1} decay={2} color={car.theme.ambient} intensity={0} />
+      <pointLight ref={accentB} position={[0.85, 0.62, -0.1]} distance={1.1} decay={2} color={car.theme.ambient} intensity={0} />
 
       {/* The road surface is lit analytically in its own shader; these two exist
           to light hazard actors and roadside props ahead of the car. */}
