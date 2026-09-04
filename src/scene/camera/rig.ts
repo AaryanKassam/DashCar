@@ -160,8 +160,9 @@ export function buildPoses(car: CarDefinition): Record<PoseId, CameraPose> {
     id: 'exteriorTurntable',
     anchor: car.exterior.turntableTarget,
     radius: car.exterior.turntableRadius,
-    // Default 3/4 front, camera off the car's front-left corner.
-    yaw: -36 * DEG,
+    // Default three-quarter front. Yaw 0 sits behind the car (forward is −z),
+    // so the front-left corner is a little past a half turn.
+    yaw: -144 * DEG,
     // Slightly above the beltline, looking gently down.
     pitch: 9 * DEG,
     fov: 32,

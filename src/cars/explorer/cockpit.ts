@@ -14,11 +14,20 @@ import type { PowertrainProfile } from '../../simulation/physics'
  * those and with the framing in `reference/configurator-interior.png`.
  */
 
-/** Vehicle envelope, in cabin coordinates. */
-const FRONT_BUMPER_Z = -3.3
-const REAR_BUMPER_Z = 1.76
-const FRONT_AXLE_Z = -2.35
-const REAR_AXLE_Z = 0.68
+/**
+ * Vehicle envelope, in cabin coordinates.
+ *
+ * The driver sits in the first row, so the origin is only ~2.5 m behind the
+ * nose, not half the car's length. Getting this wrong gives the body a two-metre
+ * hood and a passenger compartment that starts halfway down the vehicle — which
+ * is exactly what the first version of the exterior looked like.
+ *
+ * Overhangs: 0.90 m front, 1.13 m rear, on a 3.03 m wheelbase, totalling 5.06 m.
+ */
+const FRONT_BUMPER_Z = -2.55
+const REAR_BUMPER_Z = 2.51
+const FRONT_AXLE_Z = -1.65
+const REAR_AXLE_Z = 1.38
 
 export const EXPLORER_COCKPIT: CockpitGeometry = {
   // Between the seats, at headrest height, biased 14 cm toward the driver so the
@@ -77,6 +86,11 @@ export const EXPLORER_BODY = {
   beltlineY: 1.24,
   roofY: 1.74,
   wheelRadius: 0.37,
+  /** Windscreen base and header, shared with the cabin package. */
+  cowlZ: -1.05,
+  headerZ: -0.62,
+  /** Where the tailgate glass meets the roof. */
+  tailGlassZ: 2.24,
 }
 
 /** 2.3 L EcoBoost I4, 300 hp / 310 lb-ft, 10-speed automatic. */

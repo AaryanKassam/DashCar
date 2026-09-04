@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { ACESFilmicToneMapping } from 'three'
 import { ExplorerCabin } from './explorer/ExplorerCabin'
+import { ExplorerBody } from './exterior/ExplorerBody'
 import { WindshieldView } from './WindshieldView'
 import { SceneLighting } from './SceneLighting'
 import { CameraRig } from './camera'
@@ -10,7 +11,8 @@ import { ScreenPanel } from './ScreenPanel'
 import { DashboardCluster } from '../cluster/DashboardCluster'
 import { InfotainmentScreen } from '../infotainment/InfotainmentScreen'
 import { useCar } from '../cars/garageStore'
-import { EXPLORER_COCKPIT } from '../cars/explorer/cockpit'
+import { EXPLORER_BODY, EXPLORER_COCKPIT } from '../cars/explorer/cockpit'
+import { ContactShadows } from '@react-three/drei'
 
 /**
  * The scene.
@@ -37,6 +39,18 @@ export function CockpitScene() {
         <WindshieldView />
         <HazardActors />
         <ExplorerCabin />
+        <ExplorerBody />
+        {/* The car has to sit on the studio floor rather than hover over it.
+            A contact shadow is the cheapest honest way to put it there. */}
+        <ContactShadows
+          position={[0, 0.01, (EXPLORER_BODY.frontBumperZ + EXPLORER_BODY.rearBumperZ) / 2]}
+          scale={9}
+          resolution={1024}
+          blur={2.4}
+          opacity={0.5}
+          far={2.2}
+          frames={1}
+        />
         <Displays />
       </Suspense>
     </Canvas>

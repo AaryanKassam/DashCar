@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { useVehicleStore } from '../state/vehicleStore'
 import { WARNING_DEFINITIONS } from '../state/vehicleTypes'
 import type { DoorId, WarningId } from '../state/vehicleTypes'
-import { useGarageStore } from '../cars/garageStore'
 import { SCENARIOS, createScenarioRunner } from '../simulation/scenarios'
 import { audio } from '../simulation/audio'
 
@@ -39,10 +38,6 @@ export function DebugPanel() {
   const surround = useVehicleStore((s) => s.surroundViewActive)
   const setWarning = useVehicleStore((s) => s.setWarning)
 
-  const cars = useGarageStore((s) => s.cars)
-  const carId = useGarageStore((s) => s.carId)
-  const selectCar = useGarageStore((s) => s.selectCar)
-
   return (
     <aside className={`debug ${open ? '' : 'debug--closed'}`}>
       <button className="debug__toggle" onClick={() => setOpen((o) => !o)}>
@@ -54,24 +49,6 @@ export function DebugPanel() {
           <h1>Vehicle bench</h1>
           <p>Inject signals onto the simulated bus.</p>
         </header>
-
-        <section>
-          <h2>Garage</h2>
-          <div className="debug__cars">
-            {cars.map((c) => (
-              <button
-                key={c.id}
-                className="debug__car"
-                data-active={c.id === carId || undefined}
-                onClick={() => selectCar(c.id)}
-                style={{ '--car-accent': c.theme.accent } as React.CSSProperties}
-              >
-                <strong>{c.name}</strong>
-                <small>{c.tagline}</small>
-              </button>
-            ))}
-          </div>
-        </section>
 
         <section>
           <h2>Scenarios</h2>

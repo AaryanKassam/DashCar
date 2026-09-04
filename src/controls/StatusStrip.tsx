@@ -25,10 +25,6 @@ export function StatusStrip({ onHelp }: { onHelp: () => void }) {
 
   return (
     <header className="strip" style={{ '--accent': car.theme.accent } as React.CSSProperties}>
-      <div className="strip__car">
-        <strong>{car.name}</strong>
-        <span>{car.tagline}</span>
-      </div>
       <div className="strip__signals">
         <Signal label="Ignition" value={engineRunning ? 'Running' : 'Off'} on={engineRunning} />
         <Signal label="Gear" value={gear} on={gear === 'D' || gear === 'R'} />

@@ -1,0 +1,76 @@
+/**
+ * Design tokens.
+ *
+ * Everything the interface layer draws — the configurator chrome, the bench
+ * panel, the help sheet — takes its spacing, radii, type and motion from here.
+ * Nothing picks a value ad hoc. Consistency is what separates a designed
+ * interface from an assembled one, and it is far easier to keep when there is
+ * exactly one place to change a number.
+ *
+ * Three radii, three durations, two easing curves. Deliberately few: the moment
+ * a fourth radius appears, the surfaces stop reading as one family.
+ *
+ * The cluster and the infotainment screens are excluded on purpose. They are
+ * *vehicle displays*, not application chrome, and they follow the automotive
+ * conventions in `cluster.css` and `infotainment.css` instead.
+ */
+
+:root {
+  /* ---- type ---- */
+  --font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --track-wide: 0.14em;
+  --track-caps: 0.18em;
+
+  /* ---- spacing, on a 4px base ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* ---- radius: three values, no more ---- */
+  --radius-pill: 999px;
+  --radius-panel: 8px;
+  --radius-inset: 4px;
+
+  /* ---- motion ---- */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 130ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+
+  /* ---- configurator chrome ----
+     Light surfaces that sit over the render, matching the reference. Separated
+     from the render by a hairline and opacity rather than a drop shadow. */
+  --chrome-surface: #f6f6f7;
+  --chrome-surface-hover: #ebebed;
+  --chrome-ink: #16181b;
+  --chrome-ink-dim: #5d626a;
+  --chrome-line: #d5d6da;
+  --chrome-active: #16181b;
+  --chrome-active-ink: #f6f6f7;
+
+  /* ---- engineering surfaces (bench panel, help) ---- */
+  --ui-bg: #07080b;
+  --ui-panel: #0f1218;
+  --ui-panel-raised: #161a21;
+  --ui-line: #262b36;
+  --ui-ink: #e8ecf3;
+  --ui-dim: #838b99;
+}
