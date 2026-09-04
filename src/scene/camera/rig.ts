@@ -86,19 +86,26 @@ export function focusPose(
   fov: number,
 ): CameraPose {
   const [pitchAim, yawAim] = panelAim
-  // The panel faces +z in its own frame; rotate that normal out into the world.
-  const nx = Math.sin(yawAim) * Math.cos(pitchAim)
-  const ny = -Math.sin(pitchAim)
+
+  // The panel faces +z in its own frame and is rotated Rx(pitch)·Ry(yaw), so its
+  // world normal is this. Deriving it rather than eyeballing it matters: an
+  // earlier version had the sign wrong and put the camera outside the car,
+  // facing the studio wall.
+  const nx = Math.sin(yawAim)
+  const ny = -Math.cos(yawAim) * Math.sin(pitchAim)
   const nz = Math.cos(yawAim) * Math.cos(pitchAim)
 
+  // Stand off along the normal...
   const anchor: [number, number, number] = [
     panelPosition[0] + nx * distance,
     panelPosition[1] + ny * distance,
     panelPosition[2] + nz * distance,
   ]
 
-  // Look back down the same normal.
-  const yaw = Math.atan2(-nx, -nz)
+  // ...and look back down it. A YXZ camera's forward is
+  // (−sin yaw·cos pitch, sin pitch, −cos yaw·cos pitch); setting that equal to
+  // −n gives these two angles.
+  const yaw = Math.atan2(nx, nz)
   const pitch = Math.asin(clamp(-ny, -1, 1))
 
   return {
@@ -153,8 +160,8 @@ export function buildPoses(car: CarDefinition): Record<PoseId, CameraPose> {
     transitionMs: 700,
   }
 
-  const infotainmentFocus = focusPose('infotainmentFocus', g.screenPosition, g.screenAim, 0.40, 34)
-  const clusterFocus = focusPose('clusterFocus', g.clusterPosition, g.clusterAim, 0.34, 32)
+  const infotainmentFocus = focusPose('infotainmentFocus', g.screenPosition, g.screenAim, 0.46, 31)
+  const clusterFocus = focusPose('clusterFocus', g.clusterPosition, g.clusterAim, 0.4, 30)
 
   const exteriorTurntable: CameraPose = {
     id: 'exteriorTurntable',

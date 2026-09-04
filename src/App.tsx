@@ -9,6 +9,7 @@ import { ViewToggle } from './configurator/ViewToggle'
 import { FocusBar } from './configurator/FocusBar'
 import { useDrivingLoop } from './simulation/drivingLoop'
 import { useDriverInput } from './input/useDriverInput'
+import { useScreenshotHooks } from './controls/screenshotHooks'
 import { useViewStore } from './state/viewStore'
 import './configurator/configurator.css'
 
@@ -32,6 +33,7 @@ export default function App() {
 
   useDrivingLoop()
   useDriverInput(toggleHelp)
+  useScreenshotHooks()
 
   const driving = mode === 'interior' && !focused
 

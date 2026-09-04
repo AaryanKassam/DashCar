@@ -96,8 +96,13 @@ export function CameraRig() {
       travelled += Math.abs(dx) + Math.abs(dy)
       if (travelled > CLICK_SLOP_PX) gesture.didDrag = true
 
-      const dYaw = -dx * YAW_PER_PX
-      const dPitch = -dy * PITCH_PER_PX
+      // Grab-the-world, not look-around: dragging right pushes the cabin right
+      // and reveals what was on the left, the way every product 360 and street
+      // panorama behaves. Inverting this is the difference between "I am turning
+      // my head" and "I am turning the car", and only one of them is a
+      // configurator.
+      const dYaw = dx * YAW_PER_PX
+      const dPitch = dy * PITCH_PER_PX
       rig.current.drag(dYaw, dPitch)
 
       const now = performance.now()

@@ -1,178 +1,170 @@
-/* Instrument cluster styling.
-   Fixed pixel layout: the panel is rendered at a known size and mapped onto a
-   plane in the 3D cabin, so it behaves like a real display of fixed resolution
-   rather than a responsive web page. */
+/* Instrument cluster.
+   A vehicle display, not application chrome: it follows automotive convention
+   rather than the interface tokens. Rendered at a fixed panel resolution and
+   mapped onto a plane in the cabin, so it behaves like a real display. */
 
 .cluster {
   --warn: #ff4438;
   --amber: #ffb02e;
   --green: #4ade80;
   --blue: #4aa8ff;
-  --gauge-track: #23262e;
-  --gauge-tick: #6b7280;
-  --gauge-hub: #0c0e12;
-  --ink: #e9edf3;
-  --ink-dim: #8a919c;
+  --track: #23262e;
+  --ink: #eef2f8;
+  --ink-dim: #858d99;
 
   width: 100%;
   height: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  padding: 10px 22px 12px;
-  background:
-    radial-gradient(120% 90% at 50% 0%, #1a1e26 0%, var(--cluster-bg) 62%),
-    var(--cluster-bg);
+  padding: 10px 26px 8px;
+  background: radial-gradient(130% 100% at 50% 0%, #171b22 0%, var(--cluster-bg) 60%), var(--cluster-bg);
   color: var(--ink);
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   font-variant-numeric: tabular-nums;
   user-select: none;
   overflow: hidden;
 }
+.cluster * { box-sizing: border-box; }
+
+/* ---------- top strip ---------- */
+.cluster__strip {
+  display: grid;
+  grid-template-columns: 260px 1fr 70px;
+  align-items: center;
+  height: 40px;
+  flex: none;
+}
+.cluster__media { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cluster__media-track {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cluster__media-artist { font-size: 11px; color: var(--ink-dim); }
+.cluster__clock { font-size: 14px; font-weight: 600; text-align: right; }
 
 /* ---------- telltales ---------- */
-.telltales {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  height: 44px;
-}
-.telltales__row {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
+.telltales { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.telltales__row { display: flex; gap: 10px; }
 .telltale,
 .telltales__turn {
   display: grid;
   place-items: center;
-  color: #2c313a; /* unlit: visible but clearly off, like a real backlit panel */
+  /* Unlit but present: a real backlit panel shows its symbols faintly. */
+  color: #2a2f38;
   transition: color 90ms linear, filter 90ms linear;
 }
-.telltale[data-on] { filter: drop-shadow(0 0 7px currentColor); }
+.telltale[data-on] { filter: drop-shadow(0 0 6px currentColor); }
 .telltale[data-on][data-severity='red'] { color: var(--warn); }
 .telltale[data-on][data-severity='amber'] { color: var(--amber); }
 .telltale[data-on][data-severity='green'] { color: var(--green); }
 .telltale[data-on][data-severity='blue'] { color: var(--blue); }
-
-.telltales__turn[data-on] {
-  color: var(--green);
-  filter: drop-shadow(0 0 9px var(--green));
-}
+.telltales__turn[data-on] { color: var(--green); filter: drop-shadow(0 0 8px var(--green)); }
 
 /* ---------- body ---------- */
 .cluster__body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 248px 1fr 248px;
+  grid-template-columns: 1fr 150px 1fr;
   align-items: center;
   gap: 12px;
 }
-.cluster__side {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-.cluster__centre {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-/* ---------- gauges ---------- */
-.gauge-tick-label { fill: var(--ink-dim); font-weight: 600; }
-.gauge-readout { fill: var(--ink); font-weight: 700; }
-.gauge-label { fill: var(--ink-dim); font-weight: 600; letter-spacing: 0.12em; }
-
-.bar-gauge { width: 200px; }
-.bar-gauge__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  color: var(--ink-dim);
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-.bar-gauge__value { color: var(--ink); font-size: 13px; letter-spacing: 0; }
-.bar-gauge__track { display: flex; gap: 3px; height: 12px; }
-.bar-gauge__track i { flex: 1; border-radius: 1px; background: var(--gauge-track); }
-
-.readouts {
-  display: flex;
-  gap: 22px;
-  margin-top: 2px;
-  font-size: 12px;
-}
-.readouts label {
-  display: block;
-  color: var(--ink-dim);
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  margin-bottom: 2px;
-}
-.readouts span { font-weight: 600; }
+.cluster__speed { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.cluster__centre { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.cluster__dial { display: flex; align-items: center; justify-content: center; gap: 18px; }
 
 /* ---------- speed ---------- */
 .speed { display: flex; align-items: baseline; gap: 8px; }
 .speed__value {
-  font-size: 132px;
+  font-size: 108px;
   font-weight: 300;
-  line-height: 0.92;
-  letter-spacing: -0.05em;
-  /* Speed is the single most-glanced value: it gets the most contrast. */
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  /* The single most-glanced value on the panel: it gets the most contrast. */
   color: #fff;
-  text-shadow: 0 0 26px rgb(255 255 255 / 0.18);
 }
-.speed__unit {
-  font-size: 15px;
-  letter-spacing: 0.16em;
-  color: var(--ink-dim);
-  font-weight: 600;
-}
+.speed__unit { font-size: 14px; letter-spacing: 0.16em; color: var(--ink-dim); font-weight: 600; }
 
-/* ---------- gear + mode ---------- */
-.gears { display: flex; gap: 14px; font-size: 19px; font-weight: 600; color: #3b414b; }
-.gears__item { transition: color 120ms; }
-.gears__item[data-active] {
-  color: var(--accent);
-  text-shadow: 0 0 12px var(--accent);
-}
+.gears { display: flex; gap: 13px; font-size: 17px; font-weight: 600; color: #3a4049; }
+.gears__item[data-active] { color: var(--accent); }
+
 .cluster__mode {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.2em;
   color: var(--ink-dim);
   border: 1px solid #2a2f38;
   border-radius: 999px;
-  padding: 3px 12px;
+  padding: 2px 10px;
 }
 .cluster__mode[data-mode='sport'] { color: var(--accent); border-color: var(--accent); }
 .cluster__mode[data-mode='eco'] { color: var(--green); border-color: color-mix(in srgb, var(--green) 45%, transparent); }
 
+/* ---------- vehicle graphic ---------- */
+.vehicle__body { fill: #232833; stroke: #39414f; stroke-width: 1.5; }
+.vehicle__glass { fill: #161a22; }
+.vehicle__door { fill: #2c333f; transition: fill 120ms linear; }
+.vehicle__door[data-open] { fill: var(--warn); }
+.vehicle__ring {
+  fill: none;
+  stroke: #2a3140;
+  stroke-width: 1.5;
+  stroke-dasharray: 4 6;
+  transition: opacity 200ms linear;
+}
+.vehicle__ring[data-level='caution'] { stroke: var(--amber); }
+.vehicle__ring[data-level='critical'] { stroke: var(--warn); }
+.vehicle__blip circle { fill: #6fd3ff; transition: opacity 140ms linear; }
+.vehicle__blip[data-level='caution'] circle { fill: var(--amber); }
+.vehicle__blip[data-level='critical'] circle { fill: var(--warn); }
+
+/* ---------- dial ---------- */
+.dial { position: relative; display: grid; place-items: center; }
+.dial__track { stroke: var(--track); stroke-width: 7; }
+.dial__redline { stroke: var(--warn); stroke-width: 7; opacity: 0.32; }
+.dial__value { stroke-width: 7; }
+.dial__centre {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+}
+.dial__value-text { font-size: 30px; font-weight: 600; }
+.dial__unit { font-size: 9px; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 600; }
+
+/* ---------- readouts ---------- */
+.readouts { display: flex; flex-direction: column; gap: 8px; font-size: 12px; min-width: 120px; }
+.readouts__fuel { display: flex; flex-direction: column; gap: 4px; }
+.readouts__fuel span { font-size: 9px; letter-spacing: 0.16em; color: var(--ink-dim); font-weight: 700; }
+.readouts__bar { height: 7px; border-radius: 2px; background: var(--track); overflow: hidden; }
+.readouts__bar i { display: block; height: 100%; background: var(--accent); border-radius: 2px; }
+.readouts__row { display: flex; justify-content: space-between; gap: 10px; }
+.readouts__row span:first-child { font-size: 9px; letter-spacing: 0.16em; color: var(--ink-dim); font-weight: 700; }
+.readouts__row span:last-child { font-weight: 600; }
+
 /* ---------- message line ---------- */
 .message {
-  height: 34px;
+  height: 32px;
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  font-size: 14px;
+  gap: 8px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.02em;
-  border-top: 1px solid #1e222a;
+  border-top: 1px solid #1c2029;
   color: var(--ink-dim);
 }
 .message[data-severity='red'] { color: var(--warn); }
 .message[data-severity='amber'] { color: var(--amber); }
 .message em { font-style: normal; font-size: 11px; opacity: 0.7; }
+
+/* Sport skins run a hotter background wash. */
+.cluster[data-skin='sport'] {
+  background: radial-gradient(130% 100% at 50% 0%, color-mix(in srgb, var(--accent) 9%, #14161c) 0%, var(--cluster-bg) 62%), var(--cluster-bg);
+}

@@ -36,8 +36,8 @@ export function SceneLighting() {
     const studio = world.studio
 
     if (ambient.current) {
-      ambient.current.intensity = p.ambientIntensity * (1 - studio) + 0.62 * studio
-      ;(ambient.current.color as Color).copy(p.ambientColor).lerp(new Color('#eef1f5'), studio)
+      ambient.current.intensity = p.ambientIntensity * (1 - studio) + 0.44 * studio
+      ;(ambient.current.color as Color).copy(p.ambientColor).lerp(new Color('#f0efec'), studio)
     }
     if (sun.current) {
       sun.current.intensity = p.sunIntensity * (1 - studio) + 0.9 * studio
@@ -56,7 +56,7 @@ export function SceneLighting() {
       // Fill from behind the eye point, standing in for light bounced off the
       // seats, headliner and the driver. Without it the fascia — which faces
       // away from every real light source — renders as a silhouette.
-      fill.current.intensity = (0.8 + (1 - p.nightFactor) * 2.1) * (1 - studio) + 1.9 * studio
+      fill.current.intensity = (0.8 + (1 - p.nightFactor) * 2.1) * (1 - studio) + 1.5 * studio
       ;(fill.current.color as Color).copy(p.ambientColor)
     }
     // Ambient strips are the main cabin light source after dark.
