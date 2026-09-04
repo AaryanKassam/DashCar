@@ -1,39 +1,42 @@
 import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { ACESFilmicToneMapping, PCFSoftShadowMap } from 'three'
-import { Cockpit } from './Cockpit'
-import { SteeringWheel } from './SteeringWheel'
+import { ACESFilmicToneMapping } from 'three'
+import { ExplorerCabin } from './explorer/ExplorerCabin'
 import { WindshieldView } from './WindshieldView'
 import { SceneLighting } from './SceneLighting'
-import { CameraRig } from './CameraRig'
+import { CameraRig } from './camera'
 import { HazardActors } from './HazardActors'
 import { ScreenPanel } from './ScreenPanel'
 import { DashboardCluster } from '../cluster/DashboardCluster'
 import { InfotainmentScreen } from '../infotainment/InfotainmentScreen'
 import { useCar } from '../cars/garageStore'
+import { EXPLORER_COCKPIT } from '../cars/explorer/cockpit'
 
 /**
- * The cockpit scene.
+ * The scene.
  *
- * Order of assembly mirrors how you would think about a real cabin: the world
- * outside, the light in it, the structure you sit in, then the displays set
- * into that structure.
+ * Assembly order mirrors how you would think about a real cabin: the world
+ * outside, the light in it, the structure you sit in, then the displays set into
+ * that structure. The camera rig goes first because everything else is framed
+ * by it.
+ *
+ * `near` is deliberately tiny. The nodal camera sits between the seats, and the
+ * console and seat bolsters are only centimetres away — a conventional 0.1 m
+ * near plane slices straight through them.
  */
 export function CockpitScene() {
   return (
     <Canvas
       dpr={[1, 2]}
-      camera={{ fov: 62, near: 0.04, far: 1200, position: [-0.06, 1.2, 0] }}
-      gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 0.92 }}
-      shadows={{ type: PCFSoftShadowMap }}
+      camera={{ fov: 75, near: 0.02, far: 1200, position: EXPLORER_COCKPIT.eyePoint }}
+      gl={{ antialias: true, toneMapping: ACESFilmicToneMapping, toneMappingExposure: 0.86 }}
     >
       <Suspense fallback={null}>
         <CameraRig />
         <SceneLighting />
         <WindshieldView />
         <HazardActors />
-        <Cockpit />
-        <SteeringWheel />
+        <ExplorerCabin />
         <Displays />
       </Suspense>
     </Canvas>
@@ -41,29 +44,30 @@ export function CockpitScene() {
 }
 
 function Displays() {
-  const car = useCar()
-  const g = car.cockpit
+  const g = useCar().cockpit
 
   return (
     <>
-      {/* Instrument cluster, angled up toward the driver's eye point. */}
       <ScreenPanel
         position={g.clusterPosition}
         rotation={[g.clusterAim[0], g.clusterAim[1], 0]}
         size={g.clusterSize}
-        resolution={[960, 400]}
-        bezel={0.014}
+        resolution={[1080, 405]}
+        bezel={0.01}
+        focusPose="clusterFocus"
+        label="Focus the instrument cluster"
       >
         <DashboardCluster />
       </ScreenPanel>
 
-      {/* Centre touchscreen. Angled toward the driver, as production centre
-          stacks are — a few degrees of yaw measurably cuts glance time. */}
       <ScreenPanel
         position={g.screenPosition}
         rotation={[g.screenAim[0], g.screenAim[1], 0]}
         size={g.screenSize}
-        resolution={[1100, 700]}
+        resolution={[1400, 840]}
+        bezel={0.008}
+        focusPose="infotainmentFocus"
+        label="Focus the centre touchscreen"
       >
         <InfotainmentScreen />
       </ScreenPanel>

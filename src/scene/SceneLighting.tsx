@@ -4,6 +4,7 @@ import { Environment } from '@react-three/drei'
 import { AmbientLight, BackSide, Color, DirectionalLight, PointLight, SpotLight } from 'three'
 import { useVehicleStore } from '../state/vehicleStore'
 import { useCar } from '../cars/garageStore'
+import { world } from '../simulation/worldState'
 import { palette } from './lighting'
 
 /**
@@ -29,26 +30,33 @@ export function SceneLighting() {
     const s = useVehicleStore.getState()
     const p = palette(s.timeOfDay)
 
+    // In the studio the light is soft, neutral and comes from everywhere; out
+    // on the road it is directional and coloured by the hour. One blend covers
+    // both, so the cabin does not change character when the world does.
+    const studio = world.studio
+
     if (ambient.current) {
-      ambient.current.intensity = p.ambientIntensity
-      ;(ambient.current.color as Color).copy(p.ambientColor)
+      ambient.current.intensity = p.ambientIntensity * (1 - studio) + 0.62 * studio
+      ;(ambient.current.color as Color).copy(p.ambientColor).lerp(new Color('#eef1f5'), studio)
     }
     if (sun.current) {
-      sun.current.intensity = p.sunIntensity
-      ;(sun.current.color as Color).copy(p.sunColor)
+      sun.current.intensity = p.sunIntensity * (1 - studio) + 0.9 * studio
+      // Neutral in the studio. A warm key on a warm-grey fascia turns the whole
+      // lower cabin olive, which is not a colour that appears in the reference.
+      ;(sun.current.color as Color).copy(p.sunColor).lerp(new Color('#ffffff'), studio)
       sun.current.position.set(...p.sunPosition)
     }
     if (cabin.current) {
       // Dome light. Point lights fall off with the square of distance, so the
       // numbers here are much larger than they look — at ~1.2 m from the dash
       // roughly half of this reaches the surface.
-      cabin.current.intensity = 0.7 + p.nightFactor * 1.9
+      cabin.current.intensity = (0.7 + p.nightFactor * 1.9) * (1 - studio) + 1.1 * studio
     }
     if (fill.current) {
       // Fill from behind the eye point, standing in for light bounced off the
       // seats, headliner and the driver. Without it the fascia — which faces
       // away from every real light source — renders as a silhouette.
-      fill.current.intensity = 0.8 + (1 - p.nightFactor) * 2.1
+      fill.current.intensity = (0.8 + (1 - p.nightFactor) * 2.1) * (1 - studio) + 1.9 * studio
       ;(fill.current.color as Color).copy(p.ambientColor)
     }
     // Ambient strips are the main cabin light source after dark.

@@ -22,6 +22,9 @@ export function createRoadMaterial() {
       /** 0 = off, 1 = low beam, 2 = high beam. */
       uHeadlights: { value: 0 },
       uMarkingColor: { value: new Color('#e8e6df') },
+      /** 0 = road, 1 = seamless studio floor. */
+      uStudio: { value: 1 },
+      uStudioColor: { value: new Color('#e2e3e5') },
     },
     vertexShader: /* glsl */ `
       ${ROAD_GLSL}
@@ -53,6 +56,8 @@ export function createRoadMaterial() {
       uniform vec3 uMarkingColor;
       uniform float uNight;
       uniform float uHeadlights;
+      uniform float uStudio;
+      uniform vec3 uStudioColor;
       varying float vDepth;
       varying float vAcross;
 
@@ -141,6 +146,14 @@ export function createRoadMaterial() {
         // --- aerial perspective -------------------------------------------
         float fog = smoothstep(${(ROAD_LENGTH * 0.18).toFixed(1)}, ${(ROAD_LENGTH * 0.92).toFixed(1)}, vDepth);
         color = mix(color, uFogColor * mix(1.0, 0.35, uNight), fog);
+
+        // Dissolve into the studio. The markings and the verge go first, then
+        // the surface itself lifts to the cyclorama grey, so the road does not
+        // vanish — it becomes the floor the car is photographed on.
+        if (uStudio > 0.0) {
+          vec3 floorGrey = uStudioColor * (1.0 - smoothstep(0.0, ${(ROAD_LENGTH * 0.7).toFixed(1)}, vDepth) * 0.06);
+          color = mix(color, floorGrey, uStudio);
+        }
 
         gl_FragColor = vec4(color, 1.0);
         #include <colorspace_fragment>

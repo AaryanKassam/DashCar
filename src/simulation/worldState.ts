@@ -23,6 +23,15 @@ export const world = {
   blinkPhase: 0,
   /** Seconds the driver has continuously dwelt on the touchscreen while moving. */
   screenDwell: 0,
+  /**
+   * 0 = out on the road, 1 = the configurator's seamless grey studio.
+   *
+   * One number drives the sky, the road surface and the key light together, so
+   * the world dissolves into a cyclorama instead of being swapped for one. It
+   * lives here rather than in a store because it changes every frame during the
+   * blend and only the renderer consumes it.
+   */
+  studio: 1,
 }
 
 export function resetWorld() {
@@ -34,4 +43,5 @@ export function resetWorld() {
   world.wheelAngle = 0
   world.blinkPhase = 0
   world.screenDwell = 0
+  world.studio = 1
 }

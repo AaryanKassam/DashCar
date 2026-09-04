@@ -77,7 +77,7 @@ export function palette(hour: number): ScenePalette {
     // Enough bounce that the cabin is not a cave, but not so much that a dark
     // dashboard stops reading as dark. Interior plastics are genuinely near
     // black; over-lighting them is the fastest way to lose the material.
-    ambientIntensity: 0.16 + day * 0.3,
+    ambientIntensity: 0.14 + day * 0.24,
     ambientColor: lerpColor('#1b2440', '#b6c2d4', day),
     fogColor,
     roadTint: lerpColor('#12141a', '#5c5f66', day),

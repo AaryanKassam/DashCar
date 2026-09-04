@@ -1,14 +1,19 @@
 import type { CarDefinition } from './carTypes'
-import { auroraGT } from './car-01/aurora'
-import { terraXL } from './car-02/terra'
-import { voltEV } from './car-03/volt'
+import { EXPLORER_TRIMS, explorerActive } from './explorer/trims'
 
-export const CARS: CarDefinition[] = [auroraGT, terraXL, voltEV]
+/**
+ * Every vehicle the app can load.
+ *
+ * Today that is the five Explorer trims. A different vehicle would be another
+ * entry with its own `cockpit` package — the registry does not distinguish, and
+ * neither does anything that reads from it.
+ */
+export const CARS: CarDefinition[] = EXPLORER_TRIMS
 
-export const DEFAULT_CAR_ID = auroraGT.id
+export const DEFAULT_CAR_ID = explorerActive.id
 
 export function getCar(id: string): CarDefinition {
-  return CARS.find((c) => c.id === id) ?? auroraGT
+  return CARS.find((c) => c.id === id) ?? explorerActive
 }
 
 export type { CarDefinition }

@@ -36,7 +36,7 @@ export function DashboardCluster() {
   const timeOfDay = useVehicleStore((s) => s.timeOfDay)
 
   const isBattery = car.energyType === 'battery'
-  const analogSpeed = cfg.style === 'analog'
+  const analogSpeed = cfg.skin === 'rugged'
 
   return (
     <div

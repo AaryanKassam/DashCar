@@ -45,6 +45,13 @@ export function Roadside() {
     const p = palette(s.timeOfDay)
     const { distance, curvature, lateralOffset } = world
 
+    // Trees have no business in a photographic studio.
+    const visible = world.studio < 0.92
+    for (const ref of [foliage, trunks, poles, lamps]) {
+      if (ref.current) ref.current.visible = visible
+    }
+    if (!visible) return
+
     const place = (depth: number, lateral: number) => {
       dummy.position.set(roadBend(depth, curvature) - lateralOffset + lateral, roadElevation(depth, distance), -depth)
     }
