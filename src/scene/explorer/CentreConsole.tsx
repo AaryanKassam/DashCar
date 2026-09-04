@@ -33,22 +33,24 @@ export function CentreConsole() {
         <meshStandardMaterial {...m.dashLower} />
       </RoundedBox>
 
-      {/* Dark top deck, so the console reads as two materials like the dash. */}
-      <RoundedBox args={[0.33, 0.03, 1.1]} radius={0.014} smoothness={3} position={[-0.02, topY, -0.1]}>
+      {/* Dark top deck. It has to be wider than the body it sits on, or a strip
+          of greige shows along each side and the console reads as one pale
+          wedge from the driver's eye point. */}
+      <RoundedBox args={[0.42, 0.04, 1.18]} radius={0.016} smoothness={3} position={[-0.02, topY + 0.012, -0.1]}>
         <meshStandardMaterial {...m.dashUpper} />
       </RoundedBox>
 
       {/* Bridge forward to the fascia, with the charge pad let into it. */}
-      <RoundedBox args={[0.36, 0.05, 0.42]} radius={0.02} smoothness={3} position={[-0.02, topY - 0.02, -0.52]} rotation={[0.2, 0, 0]}>
+      <RoundedBox args={[0.42, 0.05, 0.44]} radius={0.02} smoothness={3} position={[-0.02, topY + 0.012, -0.54]} rotation={[0.2, 0, 0]}>
         <meshStandardMaterial {...m.dashUpper} />
       </RoundedBox>
-      <mesh position={[-0.02, topY + 0.012, -0.52]} rotation={[-Math.PI / 2 + 0.2, 0, 0]}>
+      <mesh position={[-0.02, topY + 0.042, -0.54]} rotation={[-Math.PI / 2 + 0.2, 0, 0]}>
         <planeGeometry args={[0.16, 0.2]} />
         <meshStandardMaterial color="#141518" roughness={0.5} metalness={0.15} />
       </mesh>
 
       {/* ---------- rotary shifter ---------- */}
-      <group position={[-0.07, topY + 0.014, -0.32]}>
+      <group position={[-0.07, topY + 0.03, -0.3]}>
         <mesh rotation={[-Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.052, 0.056, 0.028, 32]} />
           <meshStandardMaterial {...m.trim} />
@@ -69,7 +71,7 @@ export function CentreConsole() {
         [0.09, -0.12],
         [0.09, 0.02],
       ].map(([x, z]) => (
-        <mesh key={z} position={[x, topY - 0.03, z]} rotation={[-Math.PI / 2, 0, 0]}>
+        <mesh key={z} position={[x, topY - 0.01, z]} rotation={[-Math.PI / 2, 0, 0]}>
           <cylinderGeometry args={[0.042, 0.04, 0.07, 24, 1, true]} />
           <meshStandardMaterial color="#111214" roughness={0.85} side={2} />
         </mesh>

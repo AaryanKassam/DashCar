@@ -172,12 +172,11 @@ kbd {
   line-height: 1.5;
   color: var(--ui-dim);
   min-height: 34px;
-  border-left: 2px solid var(--ui-line);
-  padding-left: 10px;
+  padding-left: 0;
   opacity: 0;
   transition: opacity 220ms;
 }
-.debug__note[data-on] { opacity: 1; border-left-color: #4ade80; color: #cfd6e2; }
+.debug__note[data-on] { opacity: 1; color: #cfd6e2; }
 
 .debug__grid { display: flex; flex-wrap: wrap; gap: 6px; }
 .debug__chip {

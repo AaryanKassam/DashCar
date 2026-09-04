@@ -133,12 +133,12 @@ export function MapApp() {
     <div className="map">
       <button className="map__banner" onClick={focusManeuver} aria-label="Zoom to next manoeuvre">
         <TurnArrow turn={next.turn} />
-        <span className="map__banner-dist" ref={distanceRef}>—</span>
+        <span className="map__banner-dist" ref={distanceRef}>–</span>
         <span className="map__banner-road">
           <strong>{next.road}</strong>
           <small>{next.detail}</small>
         </span>
-        <span className="map__eta" ref={etaRef}>—</span>
+        <span className="map__eta" ref={etaRef}>–</span>
       </button>
 
       <div className="map__canvas">

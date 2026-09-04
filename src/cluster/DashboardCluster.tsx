@@ -216,11 +216,11 @@ function Readouts() {
       </div>
       <div className="readouts__row">
         <span>RANGE</span>
-        <span ref={range}>—</span>
+        <span ref={range}>–</span>
       </div>
       <div className="readouts__row">
         <span>ODO</span>
-        <span ref={odo}>—</span>
+        <span ref={odo}>–</span>
       </div>
     </div>
   )

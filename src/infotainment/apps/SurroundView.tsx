@@ -131,7 +131,7 @@ export function SurroundView() {
       const level = threatLevel(nearestHazardDistance)
       if (bannerRef.current) bannerRef.current.dataset.level = level
       if (nearestRef.current) {
-        nearestRef.current.textContent = nearestHazardDistance === null ? '—' : `${nearestHazardDistance.toFixed(1)} m`
+        nearestRef.current.textContent = nearestHazardDistance === null ? '–' : `${nearestHazardDistance.toFixed(1)} m`
       }
       const now = performance.now()
       if (level === 'critical' && (lastLevel !== 'critical' || now - lastAlert > 420)) {
@@ -151,7 +151,7 @@ export function SurroundView() {
       <div className="adas__banner" ref={bannerRef} data-level="none">
         <strong>Surround view</strong>
         <span>
-          {count} object{count === 1 ? '' : 's'} tracked · nearest <span ref={nearestRef}>—</span>
+          {count} object{count === 1 ? '' : 's'} tracked · nearest <span ref={nearestRef}>–</span>
         </span>
       </div>
 

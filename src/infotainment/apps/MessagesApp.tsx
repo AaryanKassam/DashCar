@@ -53,7 +53,7 @@ const THREADS: Thread[] = [
   },
   {
     id: 't3',
-    name: 'Service — Riverside',
+    name: 'Service · Riverside',
     initials: 'SR',
     preview: 'Your appointment is confirmed for Thursday',
     time: 'Yesterday',
@@ -119,7 +119,7 @@ export function MessagesApp() {
         <footer className="msg__compose">
           {moving ? (
             <>
-              <span className="msg__lock">Keyboard locked above 5 km/h — choose a reply or use voice</span>
+              <span className="msg__lock">Keyboard locked above 5 km/h. Choose a reply, or use voice.</span>
               <div className="msg__quick">
                 {QUICK_REPLIES.map((q) => (
                   <button key={q} className="btn" onClick={() => send(q)}>

@@ -49,11 +49,11 @@ export default function PanelPreview() {
       </nav>
       <div className="preview__stage">
         <section>
-          <h2>Instrument cluster — 1080 × 405</h2>
+          <h2>Instrument cluster · 1080 × 405</h2>
           <DashboardCluster />
         </section>
         <section>
-          <h2>Centre screen — 1400 × 840</h2>
+          <h2>Centre screen · 1400 × 840</h2>
           <InfotainmentScreen />
         </section>
       </div>

@@ -80,7 +80,7 @@ export function SceneLighting() {
       <directionalLight ref={sun} position={[30, 40, -40]} intensity={2} />
       {/* Cool fill from the sky through the glass, warm bounce from the cabin. */}
       <hemisphereLight args={['#a9c8e8', '#2b241c', 0.3]} />
-      <pointLight ref={cabin} position={[0, 1.72, -0.35]} distance={4} decay={2} color="#ffe6c4" intensity={2} />
+      <pointLight ref={cabin} position={[0, 1.74, -0.72]} distance={3.4} decay={2} color="#ffe6c4" intensity={0.7} />
       <pointLight ref={fill} position={[0, 1.35, 0.55]} distance={5} decay={2} color="#e6ecf5" intensity={3} />
       <pointLight ref={accentA} position={[-0.85, 0.62, -0.1]} distance={1.1} decay={2} color={car.theme.ambient} intensity={0} />
       <pointLight ref={accentB} position={[0.85, 0.62, -0.1]} distance={1.1} decay={2} color={car.theme.ambient} intensity={0} />

@@ -46,7 +46,7 @@
 .ivi__spacer { flex: 1; }
 .ivi__mode { color: var(--accent); font-weight: 700; letter-spacing: 0.14em; font-size: 12px; }
 .ivi__signal { display: flex; align-items: flex-end; gap: 2px; height: 15px; }
-.ivi__signal i { width: 3px; background: currentColor; border-radius: 1px; }
+.ivi__signal i { width: 3px; background: currentColor; border-radius: 2px; }
 .ivi__status time { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
 
 /* ---------- stage ---------- */
@@ -107,7 +107,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 14px;
   background: var(--panel-2);
   color: var(--ink);
   font-size: 16px;
@@ -176,7 +176,7 @@
   bottom: 22px;
   width: 340px;
   padding: 18px;
-  border-radius: 16px;
+  border-radius: 14px;
   background: rgb(20 25 34 / 0.95);
   border: 1px solid var(--line);
   display: flex;
@@ -201,7 +201,7 @@
   top: 18px;
   min-height: 48px;
   padding: 0 18px;
-  border-radius: 12px;
+  border-radius: 14px;
   background: rgb(20 25 34 / 0.92);
   border: 1px solid var(--line);
   font-size: 15px;
@@ -215,7 +215,7 @@
 .radio__art {
   width: 190px;
   height: 190px;
-  border-radius: 18px;
+  border-radius: 14px;
   flex: none;
   display: flex;
   align-items: flex-end;
@@ -228,8 +228,8 @@
 .radio__source { font-size: 13px; letter-spacing: 0.12em; color: var(--accent); font-weight: 700; }
 .radio__meta h2 { margin: 0; font-size: 30px; font-weight: 600; }
 .radio__meta p { margin: 0; color: var(--ink-dim); font-size: 17px; }
-.radio__progress { height: 5px; border-radius: 3px; background: var(--panel-2); margin: 12px 0 4px; overflow: hidden; }
-.radio__progress i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.radio__progress { height: 5px; border-radius: 4px; background: var(--panel-2); margin: 12px 0 4px; overflow: hidden; }
+.radio__progress i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
 .radio__transport { display: flex; gap: 12px; margin-top: 8px; }
 
 .radio__sources { display: flex; gap: 10px; }
@@ -270,7 +270,7 @@
   align-items: center;
   min-height: 52px;
   padding: 0 12px;
-  border-radius: 10px;
+  border-radius: 14px;
   cursor: pointer;
 }
 .radio__queue-row:hover { background: var(--panel); }
@@ -297,7 +297,8 @@
   cursor: pointer;
   box-sizing: border-box;
 }
-.msg__thread[data-active] { background: var(--panel); border-left: 3px solid var(--accent); padding-left: 13px; }
+.msg__thread[data-active] { background: var(--panel); }
+.msg__thread[data-active] .msg__thread-body strong { color: var(--accent); }
 .msg__avatar {
   width: 46px; height: 46px; border-radius: 50%; flex: none;
   display: grid; place-items: center;
@@ -314,8 +315,8 @@
 .msg__header strong { font-size: 18px; }
 .msg__header .btn { min-height: 44px; font-size: 14px; }
 .msg__scroll { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
-.msg__bubble { max-width: 74%; align-self: flex-start; background: var(--panel); border-radius: 16px 16px 16px 4px; padding: 12px 16px; }
-.msg__bubble[data-mine] { align-self: flex-end; background: color-mix(in srgb, var(--accent) 22%, var(--panel)); border-radius: 16px 16px 4px 16px; }
+.msg__bubble { max-width: 74%; align-self: flex-start; background: var(--panel); border-radius: 14px 14px 14px 4px; padding: 12px 16px; }
+.msg__bubble[data-mine] { align-self: flex-end; background: color-mix(in srgb, var(--accent) 22%, var(--panel)); border-radius: 14px 14px 4px 14px; }
 .msg__bubble p { margin: 0; font-size: 16px; line-height: 1.35; }
 .msg__bubble time { display: block; margin-top: 5px; font-size: 11px; color: var(--ink-dim); }
 
@@ -325,7 +326,7 @@
 .msg__quick .btn { font-size: 15px; padding: 0 18px; }
 .msg__input-row { display: flex; gap: 12px; }
 .msg__input-row input {
-  flex: 1; min-height: 56px; border-radius: 12px; border: 1px solid var(--line);
+  flex: 1; min-height: 56px; border-radius: 14px; border: 1px solid var(--line);
   background: var(--panel); color: var(--ink); padding: 0 16px; font-size: 16px; font-family: inherit;
 }
 .msg__input-row input:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -350,12 +351,12 @@
 
 .climate__seat {
   all: unset; display: flex; align-items: center; gap: 10px;
-  min-height: 50px; padding: 0 18px; border-radius: 12px;
+  min-height: 50px; padding: 0 18px; border-radius: 14px;
   border: 1px solid var(--line); font-size: 14px; color: var(--ink-dim); cursor: pointer;
 }
 .climate__seat[data-level] { color: var(--accent); border-color: var(--accent); }
 .climate__seat-bars { display: flex; gap: 3px; }
-.climate__seat-bars i { width: 5px; height: 14px; border-radius: 1px; background: var(--line); }
+.climate__seat-bars i { width: 5px; height: 14px; border-radius: 2px; background: var(--line); }
 .climate__seat-bars i[data-on] { background: var(--accent); }
 
 .climate__centre { display: flex; flex-direction: column; gap: 10px; }
@@ -363,7 +364,7 @@
   all: unset;
   min-width: 116px; min-height: 56px;
   display: grid; place-items: center;
-  border-radius: 12px; border: 1px solid var(--line);
+  border-radius: 14px; border: 1px solid var(--line);
   font-size: 15px; font-weight: 600; color: var(--ink-dim); cursor: pointer;
   transition: all 140ms;
 }
@@ -374,7 +375,7 @@
 .climate__fan-label { font-size: 13px; letter-spacing: 0.16em; color: var(--ink-dim); font-weight: 700; padding-bottom: 6px; }
 .climate__fan-bars { display: flex; align-items: flex-end; gap: 10px; flex: 1; max-width: 520px; }
 .climate__fan-bar {
-  all: unset; flex: 1; border-radius: 5px 5px 3px 3px;
+  all: unset; flex: 1; border-radius: 4px 4px 2px 2px;
   background: var(--panel-2); cursor: pointer; transition: background 130ms;
 }
 .climate__fan-bar[data-on] { background: var(--accent); }
@@ -404,18 +405,23 @@
   gap: 2px;
   padding: 0 24px;
   border-bottom: 1px solid var(--line);
-  border-left: 5px solid transparent;
-  transition: border-color 160ms, background 160ms;
+  transition: background 160ms, color 160ms;
 }
 .adas__banner strong { font-size: 19px; letter-spacing: 0.06em; }
 .adas__banner span { font-size: 14px; color: var(--ink-dim); }
-.adas__banner[data-level='info'] { border-left-color: #6fd3ff; }
-.adas__banner[data-level='caution'] { border-left-color: #ffb02e; background: rgb(255 176 46 / 0.08); }
+/* Severity tints the whole banner and its title. Carrying it on a coloured
+   edge stripe reads as a decorated card; carrying it on the surface reads as
+   the system changing state, which is what actually happened. */
+.adas__banner[data-level='info'] strong { color: #6fd3ff; }
+.adas__banner[data-level='caution'] {
+  background: rgb(255 176 46 / 0.12);
+}
+.adas__banner[data-level='caution'] strong { color: #ffb02e; }
 .adas__banner[data-level='critical'] {
-  border-left-color: #ff4438;
-  background: rgb(255 68 56 / 0.14);
+  background: rgb(255 68 56 / 0.18);
   animation: adas-alarm 640ms steps(1) infinite;
 }
+.adas__banner[data-level='critical'] strong { color: #ff4438; }
 @keyframes adas-alarm { 50% { background: rgb(255 68 56 / 0.03); } }
 
 .adas__plan { flex: 1; min-height: 0; display: block; }

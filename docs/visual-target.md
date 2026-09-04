@@ -47,8 +47,18 @@ Exterior is a separate rig: azimuth-only turntable about the vehicle centre, fix
 elevation slightly above the beltline, same inertial feel, default 3/4 front. No pitch,
 no zoom.
 
-Named poses live in `src/scene/cameraRig.ts`: `interiorDefault`, `infotainmentFocus`,
+Named poses live in `src/scene/camera/rig.ts`: `interiorDefault`, `infotainmentFocus`,
 `clusterFocus`, `driving`, `exteriorTurntable`.
+
+**Built values, after tuning against the interior reference:**
+
+| | |
+|---|---|
+| Eye point | `[-0.14, 1.28, 0.05]` m, biased 14 cm toward the driver |
+| Rest pitch | -6.5° |
+| Drag | 0.0042 rad/px yaw, 0.0034 rad/px pitch, grab-the-world direction |
+| Follow / glide | exponential follow at 15/s, release decay 3.4/s |
+| Driving yaw limit | 75° at rest, closing to 22° by 60 km/h |
 
 ### Framing note
 
@@ -130,6 +140,28 @@ Both controls sit over the render and follow the configurator's restrained styli
   the real control appears to adapt to the backdrop behind it. The build follows the
   written spec (light container, dark active pill) consistently in both modes, because a
   control that inverts itself as you switch views is harder to read, not easier.
+
+## Where the build falls short of the reference
+
+Recorded honestly, because the next session should know what to spend time on
+rather than rediscovering it.
+
+1. **The greige fascia still reads a shade light and slightly olive** next to the
+   reference's warm mid-grey. It has been darkened three times; what it probably
+   needs is a proper albedo/roughness pair and a warmer key rather than another
+   hex nudge.
+2. **The seats are barely in frame from the default pose.** They sit beside the
+   camera rather than in front of it, so at a browser's aspect ratio only their
+   front corners clip the bottom edge. The reference shows more of them; it is
+   framed at 2.34:1, which is not a shape a browser window takes.
+3. **The steering wheel is cruder than the reference** — the spoke pads are flat
+   plates and the hub is a rounded box. It reads correctly in silhouette but does
+   not hold up when the camera zooms onto it.
+4. **The exterior body is proportional, not photographic.** Deliberately: it never
+   animates or responds, so it was built to read in silhouette and stop. The
+   greenhouse-to-body transition and the rear quarter are its weakest areas.
+5. **The console is present but sparse** — shifter, cupholders and charge pad
+   exist, but only the forward end is in frame from the nodal point.
 
 ## What is modelled vs. faked
 

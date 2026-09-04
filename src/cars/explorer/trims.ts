@@ -35,7 +35,7 @@ export const explorerActive: CarDefinition = {
     accentDim: '#12365f',
     clusterBg: '#0a0c10',
     dashUpper: '#2b2c31',
-    dashLower: '#6e6a61',
+    dashLower: '#655f55',
     trim: '#7d8186',
     upholstery: '#43454b',
     stitching: '#9a4526',

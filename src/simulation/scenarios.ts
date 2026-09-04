@@ -48,7 +48,7 @@ export const SCENARIOS: Scenario[] = [
     steps: [
       { after: 0, run: () => v().setWarning('engine', true), note: 'Check-engine (amber): service soon' },
       { after: 2600, run: () => v().setWarning('abs', true), note: 'ABS unavailable' },
-      { after: 2600, run: () => { v().setWarning('oilPressure', true); audio.chime() }, note: 'Oil pressure (red): stop driving — outranks the amber message' },
+      { after: 2600, run: () => { v().setWarning('oilPressure', true); audio.chime() }, note: 'Oil pressure (red): stop driving. Outranks the amber message' },
     ],
   },
   {
@@ -58,7 +58,7 @@ export const SCENARIOS: Scenario[] = [
     steps: [
       { after: 0, run: () => v().setTimeOfDay(19.2), note: 'Dusk' },
       { after: 1800, run: () => v().setTimeOfDay(21.5), note: 'Dark' },
-      { after: 900, run: () => v().toggleHeadlights(), note: 'Low beams — screens dim automatically' },
+      { after: 900, run: () => v().toggleHeadlights(), note: 'Low beams. Screens dim automatically' },
       { after: 2400, run: () => v().toggleHighBeams(), note: 'High beams: longer, narrower throw' },
       { after: 3000, run: () => v().toggleHighBeams(), note: 'Back to low beams' },
     ],
@@ -68,10 +68,10 @@ export const SCENARIOS: Scenario[] = [
     name: 'Pedestrian crossing',
     description: 'Surround view takes over the centre screen; threat escalates to a red alert.',
     steps: [
-      { after: 0, run: () => { v().setThrottle(0); v().setBrake(0.55) }, note: 'Slowing — surround view is a low-speed system' },
+      { after: 0, run: () => { v().setThrottle(0); v().setBrake(0.55) }, note: 'Slowing. Surround view is a low-speed system' },
       { after: 2600, run: () => v().setBrake(0.25) },
       { after: 1200, run: () => { if (!v().surroundViewActive) v().toggleSurroundView() }, note: 'Surround view takes over the centre screen' },
-      { after: 2600, run: () => { v().setBrake(0.8); audio.alert() }, note: 'Track closes inside 2 m — red alert, driver brakes' },
+      { after: 2600, run: () => { v().setBrake(0.8); audio.alert() }, note: 'Track closes inside 2 m. Red alert, driver brakes' },
       { after: 2000, run: () => v().setBrake(0.1) },
     ],
   },
@@ -82,7 +82,7 @@ export const SCENARIOS: Scenario[] = [
     steps: [
       { after: 0, run: () => v().toggleDoor('frontRight'), note: 'Passenger door opened' },
       { after: 2000, run: () => v().toggleSeatbelt(), note: 'Belt unfastened' },
-      { after: 2600, run: () => v().toggleDoor('frontRight'), note: 'Door closed — telltale clears itself' },
+      { after: 2600, run: () => v().toggleDoor('frontRight'), note: 'Door closed. Telltale clears itself' },
       { after: 1600, run: () => v().toggleSeatbelt(), note: 'Belt fastened' },
     ],
   },
