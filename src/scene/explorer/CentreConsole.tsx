@@ -30,7 +30,7 @@ export function CentreConsole() {
     <group>
       {/* Console body, running back between the seats. */}
       <RoundedBox args={[0.4, topY - g.floorY, 1.15]} radius={0.045} smoothness={4} position={[-0.02, (topY + g.floorY) / 2, -0.1]}>
-        <meshStandardMaterial {...m.dashLower} />
+        <meshStandardMaterial {...m.textile} />
       </RoundedBox>
 
       {/* Dark top deck. It has to be wider than the body it sits on, or a strip

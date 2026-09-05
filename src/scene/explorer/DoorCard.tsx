@@ -71,8 +71,8 @@ export function DoorCard({ side }: { side: -1 | 1 }) {
       <StitchRun
         from={[X + out * 0.5, splitY + 0.028, -0.72]}
         to={[X + out * 0.5, splitY + 0.028, 0.28]}
-        color={t.stitching}
-        count={40}
+        color={t.accentDim}
+        count={18}
         rotation={[0, Math.PI / 2, 0]}
       />
 
@@ -83,7 +83,7 @@ export function DoorCard({ side }: { side: -1 | 1 }) {
         smoothness={3}
         position={[X + out * 0.9, splitY - 0.1, -0.18]}
       >
-        <meshStandardMaterial {...m.dashLower} />
+        <meshStandardMaterial {...m.textile} />
       </RoundedBox>
       <RoundedBox
         args={[0.095, splitY - 0.2 - g.floorY, 1.2]}

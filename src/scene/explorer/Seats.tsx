@@ -1,9 +1,6 @@
 import { RoundedBox } from '@react-three/drei'
-import { RepeatWrapping } from 'three'
-import { useMemo } from 'react'
 import { useCar } from '../../cars/garageStore'
 import { useCabinMaterials } from './materials'
-import { seatStripe } from './textures'
 
 /**
  * The two front seats.
@@ -34,12 +31,6 @@ function Seat({ side, x, cushionY, backZ }: { side: -1 | 1; x: number; cushionY:
   const t = car.theme
   const m = useCabinMaterials(t)
 
-  const stripe = useMemo(() => {
-    const map = seatStripe(t.upholstery)
-    map.wrapS = map.wrapT = RepeatWrapping
-    map.repeat.set(3, 3)
-    return map
-  }, [t.upholstery])
 
   const piping = { color: t.stitching, roughness: 0.85, metalness: 0 }
 
@@ -52,7 +43,7 @@ function Seat({ side, x, cushionY, backZ }: { side: -1 | 1; x: number; cushionY:
         </RoundedBox>
       ))}
       <RoundedBox args={[0.24, 0.09, 0.5]} radius={0.03} smoothness={3} position={[0, cushionY - 0.008, backZ - 0.28]}>
-        <meshStandardMaterial {...m.fabric} map={stripe} />
+        <meshStandardMaterial {...m.fabricPerforated} />
       </RoundedBox>
       {/* Piping along the cushion's leading edge. */}
       <mesh position={[0, cushionY - 0.03, backZ - 0.54]}>
@@ -68,7 +59,7 @@ function Seat({ side, x, cushionY, backZ }: { side: -1 | 1; x: number; cushionY:
           </RoundedBox>
         ))}
         <RoundedBox args={[0.25, 0.56, 0.1]} radius={0.03} smoothness={3} position={[0, 0, -0.012]}>
-          <meshStandardMaterial {...m.fabric} map={stripe} />
+          <meshStandardMaterial {...m.fabricPerforated} />
         </RoundedBox>
         {/* Headrest. */}
         <RoundedBox args={[0.24, 0.13, 0.11]} radius={0.045} smoothness={3} position={[0, 0.4, 0.02]}>

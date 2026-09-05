@@ -3,6 +3,7 @@ import { useCar } from '../../cars/garageStore'
 import { useCabinMaterials } from './materials'
 import { badge } from './textures'
 import { StitchRun } from './Stitching'
+import { DashProfile } from './DashProfile'
 
 /**
  * The instrument panel.
@@ -23,40 +24,28 @@ export function Dashboard() {
   const m = useCabinMaterials(t)
 
   const W = g.cabinHalfWidth
-  const dashDepth = Math.abs(g.cowlZ - g.fasciaZ)
-  const dashMidZ = (g.cowlZ + g.fasciaZ) / 2
   /** Where dark upper meets light lower. */
   const trimY = 1.12
   const fasciaFace = g.fasciaZ + 0.02
 
   return (
     <group>
-      {/* ---------- upper pad ---------- */}
-      {/* Rakes gently down toward the windscreen, the way a cowl does. */}
-      <RoundedBox
-        args={[W * 2.14, 0.11, dashDepth]}
-        radius={0.05}
-        smoothness={4}
-        position={[0, g.dashTopY - 0.055, dashMidZ]}
-        rotation={[-0.055, 0, 0]}
-      >
-        <meshStandardMaterial {...m.dashUpper} />
-      </RoundedBox>
+      {/* ---------- the panel itself ---------- */}
+      {/* One extruded cross-section rather than stacked boxes: see DashProfile
+          for why. Everything below is set onto this surface. */}
+      <DashProfile
+        cowlZ={g.cowlZ}
+        fasciaZ={g.fasciaZ}
+        dashTopY={g.dashTopY}
+        trimY={trimY}
+        width={W * 2.16}
+        material={m.dashUpper}
+      />
 
-      {/* The pad's face, dropping from the top surface to the trim line. */}
-      <RoundedBox
-        args={[W * 2.14, g.dashTopY - trimY + 0.04, 0.14]}
-        radius={0.028}
-        smoothness={4}
-        position={[0, (g.dashTopY + trimY) / 2 - 0.01, g.fasciaZ - 0.05]}
-      >
-        <meshStandardMaterial {...m.dashUpper} />
-      </RoundedBox>
-
-      {/* Stitching along the pad's leading edge. */}
+      {/* Stitching along the crown, where the pad meets the face. */}
       <StitchRun
-        from={[-W * 0.98, g.dashTopY - 0.004, g.fasciaZ + 0.012]}
-        to={[W * 0.98, g.dashTopY - 0.004, g.fasciaZ + 0.012]}
+        from={[-W * 0.98, g.dashTopY - 0.03, g.fasciaZ + 0.006]}
+        to={[W * 0.98, g.dashTopY - 0.03, g.fasciaZ + 0.006]}
         color={t.stitching}
         count={54}
       />
@@ -81,19 +70,18 @@ export function Dashboard() {
         />
       </mesh>
 
-      {/* ---------- lower fascia ---------- */}
-      {/* A band, not a wall. In the reference the greige is a shelf carrying the
-          vents and switches, with darkness above and below it; letting it run
-          from the trim line to the floor turns the whole lower half of the frame
-          into one pale slab and the cabin stops reading as a cabin. */}
-      <RoundedBox
-        args={[W * 2.14, trimY - 0.93, 0.16]}
-        radius={0.035}
-        smoothness={4}
-        position={[0, (trimY + 0.93) / 2 - 0.005, g.fasciaZ - 0.04]}
-      >
-        <meshStandardMaterial {...m.dashLower} />
-      </RoundedBox>
+      {/* Woven inserts, outboard of the centre stack. */}
+      {[-1, 1].map((side) => (
+        <RoundedBox
+          key={side}
+          args={[W * 0.72, trimY - 0.96, 0.04]}
+          radius={0.02}
+          smoothness={3}
+          position={[side * W * 0.72, (trimY + 0.96) / 2 - 0.005, fasciaFace + 0.004]}
+        >
+          <meshStandardMaterial {...m.textile} />
+        </RoundedBox>
+      ))}
 
       {/* Everything below the shelf: dark, receding into the footwells. */}
       <RoundedBox
@@ -112,7 +100,7 @@ export function Dashboard() {
         smoothness={4}
         position={[0.1, 1.03, fasciaFace + 0.006]}
       >
-        <meshStandardMaterial {...m.dashLower} />
+        <meshStandardMaterial {...m.textile} />
       </RoundedBox>
       <StitchRun
         from={[-0.12, 1.122, fasciaFace + 0.026]}

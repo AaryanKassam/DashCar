@@ -261,3 +261,124 @@ export function hubOval(): CanvasTexture {
     ctx.fillText('Ford', 256, 134)
   })
 }
+
+/**
+ * Tileable leather grain, as a height field.
+ *
+ * Used as a bump map on the dash top, the wheel rim and the seat facings. This
+ * is the single biggest thing separating a render that reads as a photographed
+ * interior from one that reads as CAD: real interior surfaces are never
+ * perfectly smooth, and a flat matte plane under soft studio light has no
+ * information in it at all. The grain does not need to be visible as grain —
+ * it needs to break up the specular response so the surface has a texture the
+ * eye can land on.
+ */
+export function leatherGrain(scale = 1): CanvasTexture {
+  const texture = draw(`leather:${scale}`, 512, 512, (ctx) => {
+    ctx.fillStyle = '#808080'
+    ctx.fillRect(0, 0, 512, 512)
+
+    // Pebbled cells: overlapping soft blobs at two frequencies.
+    for (const [count, radius, alpha] of [
+      [2600, 7, 0.055],
+      [900, 15, 0.04],
+    ] as const) {
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * 512
+        const y = Math.random() * 512
+        const r = radius * (0.5 + Math.random())
+        const g = ctx.createRadialGradient(x, y, 0, x, y, r)
+        const light = Math.random() > 0.5
+        g.addColorStop(0, `rgba(${light ? 255 : 0},${light ? 255 : 0},${light ? 255 : 0},${alpha})`)
+        g.addColorStop(1, 'rgba(128,128,128,0)')
+        ctx.fillStyle = g
+        ctx.beginPath()
+        ctx.arc(x, y, r, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+  })
+  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.repeat.set(scale, scale)
+  return texture
+}
+
+/**
+ * Woven textile, for the light insert panels.
+ *
+ * The reference cabin's pale panels are fabric, not painted plastic — you can
+ * read the weave on the passenger dash and the door cards. Rendering them as a
+ * flat colour is the main reason the first pass looked moulded, and no amount
+ * of colour correction fixes it, because the missing information is texture
+ * rather than hue.
+ */
+export function wovenFabric(base: string, tint = '#ffffff'): CanvasTexture {
+  const texture = draw(`woven:${base}:${tint}`, 256, 256, (ctx) => {
+    ctx.fillStyle = base
+    ctx.fillRect(0, 0, 256, 256)
+
+    const pitch = 4
+    // Warp and weft, offset so the over-under alternates like a real weave.
+    // Low contrast on purpose: at arm's length real cloth is close to
+    // sub-pixel, and a weave you can actually resolve reads as diamond plate.
+    for (let y = 0; y < 256; y += pitch) {
+      for (let x = 0; x < 256; x += pitch) {
+        const over = ((x / pitch + y / pitch) % 2) === 0
+        ctx.fillStyle = over ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.07)'
+        if (over) ctx.fillRect(x, y, pitch - 1, pitch - 2)
+        else ctx.fillRect(x, y, pitch - 2, pitch - 1)
+      }
+    }
+
+    // Fibre noise on top, so the weave is not a perfect grid.
+    ctx.fillStyle = tint
+    ctx.globalAlpha = 0.03
+    for (let i = 0; i < 5000; i++) {
+      ctx.fillRect(Math.random() * 256, Math.random() * 256, 1.5, 1.5)
+    }
+    ctx.globalAlpha = 1
+  })
+  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.repeat.set(14, 14)
+  return texture
+}
+
+/** Height field matching `wovenFabric`, for its bump map. */
+export function wovenBump(): CanvasTexture {
+  const texture = draw('woven-bump', 256, 256, (ctx) => {
+    ctx.fillStyle = '#808080'
+    ctx.fillRect(0, 0, 256, 256)
+    const pitch = 4
+    for (let y = 0; y < 256; y += pitch) {
+      for (let x = 0; x < 256; x += pitch) {
+        const over = ((x / pitch + y / pitch) % 2) === 0
+        ctx.fillStyle = over ? '#a0a0a0' : '#606060'
+        if (over) ctx.fillRect(x, y, pitch - 1, pitch - 2)
+        else ctx.fillRect(x, y, pitch - 2, pitch - 1)
+      }
+    }
+  })
+  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.repeat.set(14, 14)
+  return texture
+}
+
+/** Perforation pattern for seat centre panels. */
+export function perforation(base: string): CanvasTexture {
+  const texture = draw(`perf:${base}`, 128, 128, (ctx) => {
+    ctx.fillStyle = base
+    ctx.fillRect(0, 0, 128, 128)
+    ctx.fillStyle = 'rgba(0,0,0,0.42)'
+    for (let y = 6; y < 128; y += 14) {
+      for (let x = 6; x < 128; x += 14) {
+        const offset = ((y - 6) / 14) % 2 === 0 ? 0 : 7
+        ctx.beginPath()
+        ctx.arc(x + offset, y, 2.1, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    }
+  })
+  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.repeat.set(3, 3)
+  return texture
+}
