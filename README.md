@@ -224,16 +224,53 @@ the package numbers in `cars/explorer/cockpit.ts`.
 stack. There is no network request at runtime.
 
 **Faked** — markings that never move, drawn to canvas at runtime: the speaker
-grille perforations, the EXPLORER emboss, the mirror warning text, the seat
-stripe, the shifter's P-R-N-D-S ring, the wheel button glyphs and the door switch
-cluster. The environment map is three coloured shapes baked to a cube map once
-per lighting bucket, which is what gives the brightwork a highlight without
-shipping an HDRI.
+grille perforations, the EXPLORER emboss, the mirror warning text, the shifter's
+P-R-N-D-S ring, the wheel button glyphs and the door switch cluster. The
+environment map is three coloured shapes baked to a cube map once per lighting
+bucket, which is what gives the brightwork a highlight without shipping an HDRI.
 
 Nothing is a photo backplate. There is no image-sequence pan anywhere.
 
-`docs/visual-target.md` records what the build is aiming at and where it falls
-short.
+### Surface texture
+
+Every large surface carries a procedural bump map, and this is the single thing
+that separates a render that reads as a photographed interior from one that
+reads as CAD. A car interior is overwhelmingly matte, and a flat matte plane
+under soft studio light contains no information at all — no amount of colour
+correction fixes that, because the missing quantity is texture rather than hue.
+
+- **Leather grain** on the padded panels, the wheel rim and the seat bolsters.
+  Not so the grain is visible, but so the specular response varies across the
+  panel and the eye has somewhere to land.
+- **Woven textile** on the pale insert panels, which are cloth in the reference
+  rather than painted plastic. The weave is deliberately close to sub-pixel: a
+  weave you can resolve at arm's length reads as diamond plate, which is exactly
+  what the first attempt looked like.
+- **Perforation** on the seat centre panels, but not the bolsters.
+
+The instrument panel is one extruded cross-section that rolls from cowl to crown
+to shelf, rather than stacked boxes. Continuity of surface is most of what the
+eye uses to tell a moulded interior from an assembly of parts, and boxes give
+the right silhouette from one angle then fall apart the moment the camera moves
+— which is precisely what this project lets a viewer do.
+
+### Where it still falls short
+
+Honest list, worst first:
+
+- **Door cards, console and seats are still primitives.** The dash was lofted;
+  they were not, and it shows where they meet. Closing the remaining gap is a
+  modelling problem rather than a shading one.
+- **No clearcoat on the brightwork and no anisotropy in the fabric**, so both
+  hold up in silhouette and thin out under close inspection.
+- **The exterior body** is proportional, not accurate — greenhouse taper,
+  beltline kick and wheel design are approximations.
+- **No camera feed** in surround view. The real system composites four fisheye
+  cameras; this draws a synthetic plan view, which is the HMI half of the problem
+  and not the computer-vision half.
+- **Camera numbers are unverified** — see the note in `docs/visual-target.md`.
+
+`docs/visual-target.md` records what the build is aiming at in full.
 
 ---
 
