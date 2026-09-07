@@ -277,3 +277,30 @@ kbd {
 }
 .preview__stage section > .cluster,
 .preview__stage section > .ivi { border-radius: var(--radius-panel); border: 1px solid var(--ui-line); }
+
+/* ---------- interior colourway picker ---------- */
+.debug__swatches { display: flex; flex-direction: column; gap: 6px; }
+.debug__swatch {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  border: 1px solid var(--ui-line);
+  border-radius: var(--radius-panel);
+  background: transparent;
+  color: var(--ui-ink);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.debug__swatch:hover { background: var(--ui-panel-raised); }
+.debug__swatch[data-active] { border-color: #6d7686; background: var(--ui-panel-raised); }
+.debug__swatch:focus-visible { outline: 2px solid var(--ui-ink); outline-offset: 2px; }
+/* Three chips rather than one: an interior is a combination, and a single
+   square cannot say which surfaces changed. */
+.debug__swatch-chips { display: flex; flex: none; border-radius: var(--radius-inset); overflow: hidden; }
+.debug__swatch-chips i { width: 12px; height: 26px; }
+.debug__swatch-label { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.debug__swatch-label strong { font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+.debug__swatch-label small { font-size: var(--text-2xs); color: var(--ui-dim); }

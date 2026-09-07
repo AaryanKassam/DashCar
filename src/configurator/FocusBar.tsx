@@ -12,7 +12,12 @@ export function FocusBar() {
   const pose = useViewStore((s) => s.pose)
   const back = useViewStore((s) => s.back)
 
-  const label = pose === 'clusterFocus' ? 'Instrument cluster' : 'Centre touchscreen'
+  const label =
+    pose === 'clusterFocus'
+      ? 'Instrument cluster'
+      : pose === 'wheelFocus'
+        ? 'Steering wheel controls'
+        : 'Centre touchscreen'
 
   return (
     <div className="focusbar" data-open={focused || undefined}>

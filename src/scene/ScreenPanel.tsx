@@ -1,8 +1,8 @@
 import { Html, RoundedBox } from '@react-three/drei'
 import type { ReactNode } from 'react'
 import { useViewStore } from '../state/viewStore'
+import type { FocusablePose } from '../state/viewStore'
 import { gesture } from './camera'
-import type { PoseId } from './camera'
 
 /**
  * A display surface inside the cabin.
@@ -39,7 +39,7 @@ interface ScreenPanelProps {
   resolution: [number, number]
   bezel?: number
   /** The camera pose this panel focuses to when tapped. */
-  focusPose?: Extract<PoseId, 'infotainmentFocus' | 'clusterFocus'>
+  focusPose?: FocusablePose
   /** Accessible name for the shield's button. */
   label?: string
   children: ReactNode

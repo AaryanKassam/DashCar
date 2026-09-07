@@ -31,7 +31,13 @@ import type { CarDefinition } from '../../cars/carTypes'
  * configurator.
  */
 
-export type PoseId = 'interiorDefault' | 'driving' | 'infotainmentFocus' | 'clusterFocus' | 'exteriorTurntable'
+export type PoseId =
+  | 'interiorDefault'
+  | 'driving'
+  | 'infotainmentFocus'
+  | 'clusterFocus'
+  | 'wheelFocus'
+  | 'exteriorTurntable'
 
 export interface CameraPose {
   id: PoseId
@@ -163,6 +169,38 @@ export function buildPoses(car: CarDefinition): Record<PoseId, CameraPose> {
   const infotainmentFocus = focusPose('infotainmentFocus', g.screenPosition, g.screenAim, 0.46, 31)
   const clusterFocus = focusPose('clusterFocus', g.clusterPosition, g.clusterAim, 0.4, 30)
 
+  /*
+   * The wheel is not a flat panel, so it does not take a panel focus pose. The
+   * camera sits square in front of the hub on the column axis, far enough back
+   * that both switch packs and the rim are in frame at once — that framing is
+   * the point, since the reason to come here is to press the buttons and watch
+   * the cluster answer.
+   *
+   * Pitch matches the column rake, so the wheel face is square to the lens
+   * rather than keystoned.
+   */
+  const wheelFocus: CameraPose = {
+    id: 'wheelFocus',
+    anchor: [
+      g.wheelPosition[0],
+      g.wheelPosition[1] + Math.sin(g.columnRake) * 0.6,
+      g.wheelPosition[2] + Math.cos(g.columnRake) * 0.6,
+    ],
+    radius: 0,
+    yaw: 0,
+    // Tilted a few degrees above the column axis so the cluster sits in the top
+    // of frame. Pressing a switch and watching the dash answer is the whole
+    // reason this pose exists; framing the wheel alone would waste it.
+    pitch: -g.columnRake + 7 * DEG,
+    fov: 46,
+    yawRange: [-14 * DEG, 14 * DEG],
+    pitchRange: [-g.columnRake - 12 * DEG, -g.columnRake + 12 * DEG],
+    fovRange: [26, 52],
+    allow: { yaw: true, pitch: true, zoom: true },
+    motionCues: false,
+    transitionMs: 780,
+  }
+
   const exteriorTurntable: CameraPose = {
     id: 'exteriorTurntable',
     anchor: car.exterior.turntableTarget,
@@ -182,7 +220,7 @@ export function buildPoses(car: CarDefinition): Record<PoseId, CameraPose> {
     transitionMs: 1100,
   }
 
-  return { interiorDefault, driving, infotainmentFocus, clusterFocus, exteriorTurntable }
+  return { interiorDefault, driving, infotainmentFocus, clusterFocus, wheelFocus, exteriorTurntable }
 }
 
 // ---------------------------------------------------------------------------

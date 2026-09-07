@@ -382,3 +382,23 @@ export function perforation(base: string): CanvasTexture {
   texture.repeat.set(3, 3)
   return texture
 }
+
+/**
+ * A legend for one wheel switch.
+ *
+ * Only legible once the camera has come to the wheel, which is the point: at
+ * driving distance these read as texture, and close up they read as controls.
+ * Real switch caps are marked the same way and for the same reason.
+ */
+export function keyLegend(text: string, ink = '#c9ced6'): CanvasTexture {
+  return draw(`key:${text}:${ink}`, 256, 128, (ctx) => {
+    ctx.clearRect(0, 0, 256, 128)
+    ctx.fillStyle = ink
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    const size = text.length > 4 ? 44 : text.length > 3 ? 52 : 62
+    ctx.font = `700 ${size}px system-ui, -apple-system, sans-serif`
+    ctx.letterSpacing = '2px'
+    ctx.fillText(text, 128, 68)
+  })
+}

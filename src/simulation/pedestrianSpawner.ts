@@ -3,58 +3,65 @@ import type { Hazard } from '../state/vehicleTypes'
 /**
  * Stand-in for a sensor-fusion track list.
  *
- * A real surround-view system receives a list of classified objects with
- * position and velocity in the vehicle frame; the HMI's job is only to present
- * them and rank them by threat. This module fabricates that list so the HMI
- * layer can be built and demoed against a realistic shape of data.
+ * A real surround-view system receives classified objects with position and
+ * velocity in the vehicle frame; the HMI's job is to present them and rank them
+ * by threat. This module fabricates that list so the HMI can be built and demoed
+ * against a realistic shape of data.
  *
  * Coordinates: +x right of the car, +z ahead of the car, metres.
+ *
+ * ## One pedestrian, crossing in front
+ *
+ * An earlier version spawned up to seven tracks from every bearing and aimed
+ * each at a point near the origin, which meant they walked *through* the car.
+ * On the plan view that read as pedestrians strolling over the bonnet, which is
+ * both wrong and distracting: a crossing pedestrian is the scenario this display
+ * exists for, and it should look like one.
+ *
+ * So the model is now literal. One pedestrian at a time, entering from a kerb,
+ * walking laterally across the car's path at a fixed distance ahead, and leaving
+ * on the far side. It never enters the vehicle footprint, and the display never
+ * has to draw something on top of the car.
  */
-
-const KINDS: Hazard['kind'][] = ['pedestrian', 'pedestrian', 'pedestrian', 'cyclist', 'vehicle']
 
 /** Detection envelope of the simulated sensor set. */
 const RANGE = 14
-const MAX_TRACKS = 7
+/** How far out the pedestrian enters and leaves. */
+const KERB_X = 8.5
 
-/**
- * Surround view is a low-speed system, in this simulation and in every car that
- * ships one. Short-range sensors have nothing useful to say at road speed —
- * an object is through the envelope faster than the driver can react — so
- * production systems disable the view above roughly this speed rather than
- * showing a display that flickers objects in and out.
- */
 export const SURROUND_MAX_KPH = 25
 
+interface Walker extends Hazard {
+  /** Where the crossing happens, metres ahead of the bumper. */
+  crossingZ: number
+}
 
-let tracks: Hazard[] = []
+let walker: Walker | null = null
 let nextId = 1
-let spawnTimer = 0
+let gap = 0
 
-function spawn(): Hazard {
-  const kind = KINDS[Math.floor(Math.random() * KINDS.length)]
+/**
+ * Start a crossing.
+ *
+ * Distance ahead is drawn from a range that spans the whole threat ladder, so
+ * the display is exercised rather than sitting on one colour: a long crossing
+ * reads as information, a close one as a genuine alert.
+ */
+function spawn(): Walker {
+  const fromLeft = Math.random() < 0.5
+  const crossingZ = 2.2 + Math.random() * 6.5
+  const speed = 1.15 + Math.random() * 0.7
 
-  // Enter on a ring at the edge of the envelope, at any bearing.
-  const bearing = Math.random() * Math.PI * 2
-  const radius = RANGE * (0.62 + Math.random() * 0.3)
-  const x = Math.sin(bearing) * radius
-  const z = Math.cos(bearing) * radius
-
-  const speed = kind === 'pedestrian' ? 1.2 + Math.random() * 0.6 : kind === 'cyclist' ? 4.5 + Math.random() * 2 : 8 + Math.random() * 4
-
-  // Aim at a point *near* the car rather than at it. Tracks that converge on
-  // the exact origin all pile up in the middle; tracks aimed a couple of metres
-  // off produce the near-misses that make the threat ranking do any work.
-  // Offset from the car, never through it: a track that walks into the cabin
-  // is distracting in a way that teaches the viewer nothing.
-  const side = Math.random() < 0.5 ? -1 : 1
-  const aimX = side * (1.6 + Math.random() * 3)
-  const aimZ = (Math.random() - 0.5) * 6
-  const dx = aimX - x
-  const dz = aimZ - z
-  const len = Math.hypot(dx, dz) || 1
-
-  return { id: nextId++, kind, x, z, vx: (dx / len) * speed, vz: (dz / len) * speed }
+  return {
+    id: nextId++,
+    kind: 'pedestrian',
+    x: fromLeft ? -KERB_X : KERB_X,
+    z: crossingZ,
+    vx: fromLeft ? speed : -speed,
+    // Walks straight across; the car's own motion supplies the closing speed.
+    vz: 0,
+    crossingZ,
+  }
 }
 
 export interface HazardStepResult {
@@ -62,64 +69,52 @@ export interface HazardStepResult {
   nearest: number | null
 }
 
+const EMPTY: HazardStepResult = { hazards: [], nearest: null }
+
 /**
- * Advance the track list one frame.
+ * Advance the crossing one frame.
  *
- * Tracks move in the *world*, so the car's own speed slides them rearward —
- * that relative motion is what makes the surround view read as real.
+ * The pedestrian holds their line in the world, so the car's own speed closes
+ * the gap. That relative motion is what makes the display read as real, and it
+ * is also what makes the low-speed gate meaningful.
  */
 export function stepHazards(active: boolean, ownSpeedMs: number, dt: number): HazardStepResult {
   if (!active) {
-    if (tracks.length) {
-      tracks = []
-      spawnTimer = 0
-    }
-    return { hazards: tracks, nearest: null }
+    walker = null
+    gap = 0
+    return EMPTY
   }
 
-  // Seed the display on activation. A surround view that opens empty and fills
-  // in over ten seconds reads as broken, and the first thing a driver does with
-  // this screen is check whether it is showing them anything at all.
-  if (tracks.length === 0 && spawnTimer <= 0) {
-    tracks = [spawn(), spawn(), spawn()]
-    spawnTimer = 0.5
+  if (!walker) {
+    gap -= dt
+    if (gap > 0) return EMPTY
+    walker = spawn()
   }
 
-  spawnTimer -= dt
-  if (spawnTimer <= 0 && tracks.length < MAX_TRACKS) {
-    tracks = [...tracks, spawn()]
-    spawnTimer = 0.35 + Math.random() * 0.8
+  const x = walker.x + walker.vx * dt
+  // Own motion brings the crossing point toward the car.
+  const z = walker.z - ownSpeedMs * dt
+
+  // Gone past the far kerb, or behind the car: end the crossing and pause.
+  if (Math.abs(x) > KERB_X + 1.5 || z < -2 || z > RANGE) {
+    walker = null
+    gap = 1.6 + Math.random() * 2.2
+    return EMPTY
   }
 
-  let nearest: number | null = null
-  const next: Hazard[] = []
-
-  for (const t of tracks) {
-    const x = t.x + t.vx * dt
-    const z = t.z + t.vz * dt - ownSpeedMs * dt
-    // Drop tracks that leave the detection envelope.
-    if (Math.abs(x) > RANGE || z < -RANGE || z > RANGE * 1.2) continue
-
-    const moved: Hazard = { ...t, x, z }
-    next.push(moved)
-
-    const d = Math.hypot(x, z)
-    if (nearest === null || d < nearest) nearest = d
-  }
-
-  tracks = next
-  return { hazards: tracks, nearest }
+  walker = { ...walker, x, z }
+  return { hazards: [walker], nearest: Math.hypot(x, z) }
 }
 
-/** Threat ranking used by both the overlay and the warning chime. */
+/** Threat ranking used by the overlay, the cluster and the warning chime. */
 export function threatLevel(distance: number | null): 'none' | 'info' | 'caution' | 'critical' {
   if (distance === null) return 'none'
-  if (distance < 2.2) return 'critical'
-  if (distance < 4.5) return 'caution'
+  if (distance < 3.2) return 'critical'
+  if (distance < 6) return 'caution'
   return 'info'
 }
 
 export function resetHazards() {
-  tracks = []
-  spawnTimer = 0
+  walker = null
+  gap = 0
 }

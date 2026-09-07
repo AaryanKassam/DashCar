@@ -32,7 +32,7 @@ const CX = 430
 const CY = H / 2
 /** Pixels per metre in the plan view: the full 14 m envelope has to fit. */
 const PPM = 17.5
-const POOL = 8
+const POOL = 1
 const RINGS = [2, 4, 6, 8, 10]
 
 /** Eight sectors, starting directly ahead and going clockwise. */

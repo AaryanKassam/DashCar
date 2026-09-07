@@ -5,7 +5,10 @@ import { Group } from 'three'
 import { useCar } from '../../cars/garageStore'
 import { world } from '../../simulation/worldState'
 import { useCabinMaterials } from './materials'
-import { hubOval, spokeButtons } from './textures'
+import { hubOval } from './textures'
+import { WheelPad, leftPadButtons, rightPadButtons } from './WheelButtons'
+import { useViewStore } from '../../state/viewStore'
+import { gesture } from '../camera'
 import { StitchArc } from './Stitching'
 
 /**
@@ -66,20 +69,15 @@ export function SteeringWheel() {
               <boxGeometry args={[R * 0.86, 0.05, 0.018]} />
               <meshStandardMaterial color="#1b1c21" roughness={0.6} metalness={0.2} />
             </mesh>
-            {/* Button pad, angled a few degrees toward the driver's thumb. */}
-            <group position={[side * R * 0.55, 0, 0.012]} rotation={[0, 0, 0]}>
-              <RoundedBox args={[R * 0.56, 0.055, 0.011]} radius={0.006} smoothness={3}>
-                <meshStandardMaterial color="#25272d" roughness={0.55} metalness={0.12} />
-              </RoundedBox>
-              <mesh position={[0, 0, 0.0075]}>
-                <planeGeometry args={[R * 0.52, 0.046]} />
-                <meshStandardMaterial
-                  map={spokeButtons(side < 0 ? 'left' : 'right', '#25272d')}
-                  roughness={0.55}
-                  metalness={0.05}
-                />
-              </mesh>
-            </group>
+            {/* Real switches, not glyphs on a texture: once the camera can come
+                to the wheel, a pad that only looks like buttons gives the whole
+                thing away. */}
+            <WheelPad
+              side={side as -1 | 1}
+              radius={R}
+              accent={t.accent}
+              buttons={side < 0 ? leftPadButtons() : rightPadButtons()}
+            />
           </group>
         ))}
 
@@ -94,7 +92,24 @@ export function SteeringWheel() {
         </mesh>
 
         {/* ---------- hub ---------- */}
-        <RoundedBox args={[R * 0.78, R * 0.5, 0.034]} radius={0.016} smoothness={4} position={[0, 0, 0.004]}>
+        {/* The hub is the affordance for zooming in: it is the one part of the
+            wheel with no other job. */}
+        <RoundedBox
+          args={[R * 0.78, R * 0.5, 0.034]}
+          radius={0.016}
+          smoothness={4}
+          position={[0, 0, 0.004]}
+          onPointerOver={(e) => {
+            e.stopPropagation()
+            document.body.style.cursor = 'zoom-in'
+          }}
+          onPointerOut={() => (document.body.style.cursor = '')}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (gesture.didDrag) return
+            if (useViewStore.getState().pose !== 'wheelFocus') useViewStore.getState().focus('wheelFocus')
+          }}
+        >
           <meshStandardMaterial color="#141519" roughness={0.68} metalness={0.08} />
         </RoundedBox>
         <mesh position={[0, 0.004, 0.024]}>

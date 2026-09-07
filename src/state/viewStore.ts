@@ -1,6 +1,9 @@
 import { create } from 'zustand'
 import type { PoseId } from '../scene/camera/rig'
 
+/** Poses a viewer can enter by clicking something in the cabin. */
+export type FocusablePose = Extract<PoseId, 'infotainmentFocus' | 'clusterFocus' | 'wheelFocus'>
+
 /**
  * What the viewer is looking at.
  *
@@ -21,7 +24,7 @@ interface ViewState {
   focused: boolean
 
   setMode: (mode: ViewMode) => void
-  focus: (pose: Extract<PoseId, 'infotainmentFocus' | 'clusterFocus'>) => void
+  focus: (pose: FocusablePose) => void
   back: () => void
   /** The driving loop nudges the camera between resting and driving poses. */
   setDriving: (driving: boolean) => void

@@ -4,7 +4,7 @@ import { PedalControls } from './controls/PedalControls'
 import { DebugPanel } from './controls/DebugPanel'
 import { HelpOverlay } from './controls/HelpOverlay'
 import { StatusStrip } from './controls/StatusStrip'
-import { TrimSelector } from './configurator/TrimSelector'
+import { VehicleBadge } from './configurator/VehicleBadge'
 import { ViewToggle } from './configurator/ViewToggle'
 import { FocusBar } from './configurator/FocusBar'
 import { useDrivingLoop } from './simulation/drivingLoop'
@@ -41,7 +41,7 @@ export default function App() {
     <div className="app">
       <CockpitScene />
 
-      <TrimSelector />
+      <VehicleBadge />
       <ViewToggle />
       <FocusBar />
 

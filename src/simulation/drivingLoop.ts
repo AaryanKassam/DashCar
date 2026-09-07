@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
-import { useVehicleStore } from '../state/vehicleStore'
+import { CRUISE_MIN_KPH, useVehicleStore } from '../state/vehicleStore'
 import { useGarageStore } from '../cars/garageStore'
+import { getCar } from '../cars/carRegistry'
 import {
   DRIVE_MODE_TUNING,
   engineRpm,
@@ -57,12 +58,26 @@ export function useDrivingLoop() {
       last = now
 
       const s = useVehicleStore.getState()
-      const car = useGarageStore.getState().car
+      const car = getCar(useGarageStore.getState().carId)
       const profile = car.powertrain
       const tuning = DRIVE_MODE_TUNING[s.driveMode] ?? DRIVE_MODE_TUNING.comfort
 
       const reverse = s.gear === 'R'
       const driveEngaged = (s.gear === 'D' || s.gear === 'R') && s.engineRunning
+
+      /*
+       * Cruise control.
+       *
+       * A proportional hold on the set speed, clamped to sane throttle. It
+       * cannot brake — this is conventional cruise, not adaptive — so on a
+       * descent it simply lifts off, which is exactly what the real system
+       * does and is worth not hiding.
+       */
+      let throttle = s.throttle
+      if (s.cruiseActive && driveEngaged && !reverse) {
+        const error = s.cruiseSetKph - s.speed
+        throttle = Math.max(0, Math.min(0.85, 0.06 * error))
+      }
 
       // --- fixed-step integration -------------------------------------------
       // If something outside the loop moved the speed signal — a reset, a car
@@ -77,7 +92,7 @@ export function useDrivingLoop() {
         const r = stepLongitudinal(profile, tuning, {
           speedMs,
           reverse,
-          throttle: s.throttle,
+          throttle,
           brake: s.brake,
           driveEngaged,
           engineRunning: s.engineRunning,
@@ -95,7 +110,7 @@ export function useDrivingLoop() {
       if (car.singleSpeed) {
         gearIndexRef.current = 0
       } else if (driveEngaged && !reverse) {
-        gearIndexRef.current = selectGear(profile, tuning, speedMs, gearIndexRef.current, s.throttle)
+        gearIndexRef.current = selectGear(profile, tuning, speedMs, gearIndexRef.current, throttle)
       } else if (!driveEngaged || speedMs < 0.5) {
         gearIndexRef.current = 0
       }
@@ -104,7 +119,7 @@ export function useDrivingLoop() {
       if (s.engineRunning) {
         const geared = engineRpm(profile, speedMs, reverse ? 0 : gearIndexRef.current)
         // Idle floor, plus a little throttle blip in neutral/park.
-        const idle = profile.idleRpm + (driveEngaged ? 0 : s.throttle * 3200)
+        const idle = profile.idleRpm + (driveEngaged ? 0 : throttle * 3200)
         rpm = Math.min(Math.max(geared, idle), profile.redlineRpm)
       }
 
@@ -154,7 +169,7 @@ export function useDrivingLoop() {
           const regenKw = s.brake * speedMs * 3
           fuel = Math.min(1, Math.max(0, fuel - ((drawKw - regenKw) * frameDt) / 82 / 3600))
         } else if (s.engineRunning) {
-          fuel = Math.max(0, fuel - fuelFlow(s.throttle, rpm, profile.idleRpm || 800) * frameDt * 0.02)
+          fuel = Math.max(0, fuel - fuelFlow(throttle, rpm, profile.idleRpm || 800) * frameDt * 0.02)
         }
 
         // Coolant warms toward an operating temperature that rises with load.
@@ -171,6 +186,10 @@ export function useDrivingLoop() {
           trackedHazards: hazardResult.hazards,
           nearestHazardDistance: hazardResult.nearest,
         })
+
+        if (s.cruiseActive && msToKph(speedMs) < CRUISE_MIN_KPH - 5) {
+          useVehicleStore.getState().applyTick({ cruiseActive: false })
+        }
 
         runMonitors()
       }

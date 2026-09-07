@@ -91,6 +91,13 @@ export interface VehicleSignals {
   /** 0 = midnight, 12 = noon. Drives the whole scene's lighting. */
   timeOfDay: number
 
+  // --- driver assistance ----------------------------------------------------
+  /** Cruise engaged and holding. */
+  cruiseActive: boolean
+  /** Target speed, km/h. Held even when cruise is off, as a real system does. */
+  cruiseSetKph: number
+  laneKeeping: boolean
+
   // --- body / safety --------------------------------------------------------
   doors: Record<DoorId, boolean>
   seatbeltFastened: boolean

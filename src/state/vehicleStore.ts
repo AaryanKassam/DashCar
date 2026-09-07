@@ -34,6 +34,13 @@ export interface VehicleActions {
   toggleHazards: () => void
   setTimeOfDay: (hour: number) => void
 
+  /** Engage or cancel cruise. Refuses below the minimum engage speed. */
+  toggleCruise: () => void
+  /** Nudge the set speed, or capture the current speed if not yet set. */
+  nudgeCruise: (deltaKph: number) => void
+  resumeCruise: () => void
+  toggleLaneKeeping: () => void
+
   toggleDoor: (door: DoorId) => void
   toggleSeatbelt: () => void
 
@@ -51,6 +58,9 @@ export interface VehicleActions {
 export type VehicleStore = VehicleSignals & VehicleActions
 
 const GEAR_ORDER: Gear[] = ['P', 'R', 'N', 'D']
+
+/** Below this, cruise will not engage. */
+export const CRUISE_MIN_KPH = 30
 
 export const initialSignals: VehicleSignals = {
   speed: 0,
@@ -73,6 +83,10 @@ export const initialSignals: VehicleSignals = {
   rightIndicator: false,
   indicatorOn: false,
   timeOfDay: 14,
+
+  cruiseActive: false,
+  cruiseSetKph: 0,
+  laneKeeping: true,
 
   doors: { frontLeft: false, frontRight: false, rearLeft: false, rearRight: false, trunk: false },
   seatbeltFastened: true,
@@ -98,7 +112,13 @@ export const useVehicleStore = create<VehicleStore>()(
     applyTick: (patch) => set(patch),
 
     setThrottle: (v) => set({ throttle: clamp(v, 0, 1) }),
-    setBrake: (v) => set({ brake: clamp(v, 0, 1) }),
+    setBrake: (v) => {
+      const brake = clamp(v, 0, 1)
+      // Touching the brake cancels cruise. Not a nicety: it is the primary way
+      // a driver expects to take back control.
+      if (brake > 0.02 && get().cruiseActive) set({ cruiseActive: false })
+      set({ brake })
+    },
     setSteering: (v) => set({ steering: clamp(v, -1, 1) }),
 
     setGear: (gear) => {
@@ -150,6 +170,29 @@ export const useVehicleStore = create<VehicleStore>()(
       set({ hazards: on, leftIndicator: on, rightIndicator: on, indicatorOn: on })
     },
     setTimeOfDay: (hour) => set({ timeOfDay: clamp(hour, 0, 24) }),
+
+    toggleCruise: () => {
+      const { cruiseActive, speed, gear } = get()
+      if (cruiseActive) {
+        set({ cruiseActive: false })
+        return
+      }
+      // Real systems refuse to engage below a floor and out of Drive; modelling
+      // the refusal is more informative than silently allowing it.
+      if (gear !== 'D' || speed < CRUISE_MIN_KPH) return
+      set({ cruiseActive: true, cruiseSetKph: Math.round(speed) })
+    },
+    nudgeCruise: (deltaKph) => {
+      const { cruiseSetKph, speed } = get()
+      const base = cruiseSetKph > 0 ? cruiseSetKph : Math.round(speed)
+      set({ cruiseSetKph: clamp(base + deltaKph, CRUISE_MIN_KPH, 180) })
+    },
+    resumeCruise: () => {
+      const { cruiseSetKph, gear, speed } = get()
+      if (gear !== 'D' || cruiseSetKph < CRUISE_MIN_KPH || speed < CRUISE_MIN_KPH) return
+      set({ cruiseActive: true })
+    },
+    toggleLaneKeeping: () => set({ laneKeeping: !get().laneKeeping }),
 
     toggleDoor: (door) => set({ doors: { ...get().doors, [door]: !get().doors[door] } }),
     toggleSeatbelt: () => set({ seatbeltFastened: !get().seatbeltFastened }),

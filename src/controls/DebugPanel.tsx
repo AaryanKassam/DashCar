@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useVehicleStore } from '../state/vehicleStore'
 import { WARNING_DEFINITIONS } from '../state/vehicleTypes'
 import type { DoorId, WarningId } from '../state/vehicleTypes'
+import { useGarageStore } from '../cars/garageStore'
 import { SCENARIOS, createScenarioRunner } from '../simulation/scenarios'
 import { audio } from '../simulation/audio'
 
@@ -38,6 +39,10 @@ export function DebugPanel() {
   const surround = useVehicleStore((s) => s.surroundViewActive)
   const setWarning = useVehicleStore((s) => s.setWarning)
 
+  const interiors = useGarageStore((s) => s.interiors)
+  const interiorId = useGarageStore((s) => s.interiorId)
+  const selectInterior = useGarageStore((s) => s.selectInterior)
+
   return (
     <aside className={`debug ${open ? '' : 'debug--closed'}`}>
       <button className="debug__toggle" onClick={() => setOpen((o) => !o)}>
@@ -49,6 +54,33 @@ export function DebugPanel() {
           <h1>Vehicle bench</h1>
           <p>Inject signals onto the simulated bus.</p>
         </header>
+
+        <section>
+          <h2>Interior</h2>
+          <div className="debug__swatches">
+            {interiors.map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                className="debug__swatch"
+                data-active={c.id === interiorId || undefined}
+                aria-pressed={c.id === interiorId}
+                onClick={() => selectInterior(c.id)}
+                title={c.note}
+              >
+                <span className="debug__swatch-chips" aria-hidden="true">
+                  {c.swatch.map((hex) => (
+                    <i key={hex} style={{ background: hex }} />
+                  ))}
+                </span>
+                <span className="debug__swatch-label">
+                  <strong>{c.name}</strong>
+                  <small>{c.note}</small>
+                </span>
+              </button>
+            ))}
+          </div>
+        </section>
 
         <section>
           <h2>Scenarios</h2>

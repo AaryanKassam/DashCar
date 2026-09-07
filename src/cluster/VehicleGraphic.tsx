@@ -38,11 +38,20 @@ export function VehicleGraphic() {
           g.style.opacity = '0'
           continue
         }
-        // 14 m of envelope mapped onto 46 px of margin around the car.
-        const scale = 46 / 14
+        // A proximity ring, not a scale plan. The car silhouette is drawn at
+        // roughly 20 px per metre and the envelope reaches 14 m, so a linear
+        // map would put anything closer than 6 m *inside* the car. Bearing sets
+        // the angle, distance sets how close the blip sits to the body, and the
+        // blip is always outside it.
+        const distance = Math.hypot(t.x, t.z)
+        const bearing = Math.atan2(t.x, t.z)
+        const radius = 54 + Math.min(1, distance / 14) * 22
         g.style.opacity = '1'
-        g.setAttribute('transform', `translate(${60 + t.x * scale} ${74 - t.z * scale})`)
-        g.dataset.level = threatLevel(Math.hypot(t.x, t.z))
+        g.setAttribute(
+          'transform',
+          `translate(${60 + Math.sin(bearing) * radius} ${74 - Math.cos(bearing) * radius})`,
+        )
+        g.dataset.level = threatLevel(distance)
       }
       raf = requestAnimationFrame(frame)
     }
@@ -67,7 +76,7 @@ export function VehicleGraphic() {
       <rect x={48} y={126} width={24} height={8} rx={3} className="vehicle__door" data-open={doors.trunk || undefined} />
 
       {/* Tracked objects. */}
-      {Array.from({ length: 6 }).map((_, i) => (
+      {Array.from({ length: 1 }).map((_, i) => (
         <g key={i} ref={(el) => void (blips.current[i] = el)} className="vehicle__blip" style={{ opacity: 0 }}>
           <circle r={4.5} />
         </g>
