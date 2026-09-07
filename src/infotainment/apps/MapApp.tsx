@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { world } from '../../simulation/worldState'
 import { useCar } from '../../cars/garageStore'
+import { useLiveDataStore } from '../../state/liveDataStore'
+import { MAP_CENTRE, OSM_ATTRIBUTION, lonLatToTile, tileUrl } from '../liveData'
 
 /**
  * Navigation.
@@ -68,6 +70,7 @@ export function MapApp() {
   const distanceRef = useRef<HTMLSpanElement>(null)
   const etaRef = useRef<HTMLSpanElement>(null)
   const [focus, setFocus] = useState<Focus>(null)
+  const liveTiles = useLiveDataStore((s) => s.mapTiles)
   const [nextIdx, setNextIdx] = useState(0)
 
   useEffect(() => {
@@ -164,7 +167,7 @@ export function MapApp() {
               transition: 'transform 760ms cubic-bezier(0.32, 0.72, 0, 1)',
             }}
           >
-            <MapBase />
+            {liveTiles ? <TileLayer /> : <MapBase />}
 
             <path ref={routeRef} d={ROUTE_D} fill="none" stroke="var(--map-route-dim)" strokeWidth={12} strokeLinecap="round" strokeLinejoin="round" />
             <RouteProgress d={ROUTE_D} accent={car.theme.accent} ref={travelledRef} />
@@ -216,6 +219,8 @@ export function MapApp() {
             </>
           )}
         </div>
+
+        {liveTiles && <span className="map__attribution">{OSM_ATTRIBUTION}</span>}
 
         {focus && (
           <button className="map__zoomout" onClick={() => setFocus(null)} aria-label="Zoom out to route overview">
@@ -286,5 +291,46 @@ function PoiGlyph({ kind, x, y }: { kind: Poi['kind']; x: number; y: number }) {
     <text x={x} y={y + 1} textAnchor="middle" dominantBaseline="central" fontSize={11} fontWeight={700} fill="#0b0d10">
       {glyph[kind]}
     </text>
+  )
+}
+
+/**
+ * Real OpenStreetMap raster tiles, drawn under the route.
+ *
+ * A fixed 4x3 block around the demo route rather than a pannable slippy map:
+ * the interaction this screen is demonstrating is *zoom to a junction*, not
+ * free browsing, and the OSM tile servers are donated infrastructure that
+ * should not be asked for more than the view needs.
+ *
+ * Attribution is drawn on the map because the usage policy requires it, not
+ * because it is decorative.
+ */
+function TileLayer() {
+  const zoom = 14
+  const size = 256
+  const origin = lonLatToTile(MAP_CENTRE.lon, MAP_CENTRE.lat, zoom)
+  const cols = 5
+  const rows = 3
+  const x0 = Math.floor(origin.x) - 2
+  const y0 = Math.floor(origin.y) - 1
+  // Scale the tile block to cover the viewBox.
+  const scale = VIEW_W / (cols * size)
+
+  return (
+    <g className="map__tiles" transform={`scale(${scale})`} opacity={0.85}>
+      {Array.from({ length: rows }).flatMap((_, r) =>
+        Array.from({ length: cols }).map((_, c) => (
+          <image
+            key={`${r}:${c}`}
+            href={tileUrl(zoom, x0 + c, y0 + r)}
+            x={c * size}
+            y={r * size}
+            width={size}
+            height={size}
+            preserveAspectRatio="none"
+          />
+        )),
+      )}
+    </g>
   )
 }
