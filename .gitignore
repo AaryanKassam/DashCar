@@ -11,3 +11,8 @@ reference/
 # ECC is reinstallable with one command; keeping 160+ skill files out of a
 # portfolio repo that people will browse.
 .claude/
+
+# Throwaway Playwright harnesses used while debugging a specific view. The
+# committed capture tool is tools/capture.mjs; these are scratch and have been
+# swept into commits by `git add -A` before.
+.*.mjs
