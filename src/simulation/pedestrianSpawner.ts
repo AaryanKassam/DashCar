@@ -29,6 +29,18 @@ const RANGE = 14
 /** How far out the pedestrian enters and leaves. */
 const KERB_X = 8.5
 
+/**
+ * The crossing never gets closer than this.
+ *
+ * Without a floor the car's own speed carries the crossing point straight past
+ * the bumper, and within a second the pedestrian is *beside* the car rather than
+ * in front of it — which is both wrong for the scenario and wrong for the
+ * display, since the plan view then has to draw them over the vehicle. Holding
+ * the crossing ahead models the thing that would actually happen: a driver sees
+ * someone stepping out and slows for them.
+ */
+const MIN_CROSSING_Z = 2.6
+
 export const SURROUND_MAX_KPH = 25
 
 interface Walker extends Hazard {
@@ -92,11 +104,15 @@ export function stepHazards(active: boolean, ownSpeedMs: number, dt: number): Ha
   }
 
   const x = walker.x + walker.vx * dt
-  // Own motion brings the crossing point toward the car.
-  const z = walker.z - ownSpeedMs * dt
+  // Own motion closes on the crossing, easing off as the floor approaches. A
+  // hard clamp would snap the track to a stop; tapering the closing rate over
+  // the last few metres looks like what it represents, which is a driver lifting
+  // off for someone in the road.
+  const ease = Math.min(1, Math.max(0, (walker.z - MIN_CROSSING_Z) / 3))
+  const z = Math.max(MIN_CROSSING_Z, walker.z - ownSpeedMs * ease * dt)
 
-  // Gone past the far kerb, or behind the car: end the crossing and pause.
-  if (Math.abs(x) > KERB_X + 1.5 || z < -2 || z > RANGE) {
+  // Reached the far kerb: the crossing is complete, so pause before the next.
+  if (Math.abs(x) > KERB_X + 1.5 || z > RANGE) {
     walker = null
     gap = 1.6 + Math.random() * 2.2
     return EMPTY
