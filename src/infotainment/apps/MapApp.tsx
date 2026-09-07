@@ -316,21 +316,46 @@ function TileLayer() {
   // Scale the tile block to cover the viewBox.
   const scale = VIEW_W / (cols * size)
 
+  // Tiles are a network read over donated infrastructure, so they can be slow
+  // or simply not arrive. Each one stays transparent until it loads and fades
+  // in rather than popping, and one that fails is left transparent so the drawn
+  // vector map underneath shows through. A missing tile degrades to the offline
+  // map instead of leaving a hole.
+  const [settled, setSettled] = useState<Record<string, 'loaded' | 'failed'>>({})
+  const total = rows * cols
+  const done = Object.keys(settled).length
+  const mark = (k: string, state: 'loaded' | 'failed') =>
+    setSettled((prev) => (prev[k] ? prev : { ...prev, [k]: state }))
+
   return (
-    <g className="map__tiles" transform={`scale(${scale})`} opacity={0.85}>
-      {Array.from({ length: rows }).flatMap((_, r) =>
-        Array.from({ length: cols }).map((_, c) => (
-          <image
-            key={`${r}:${c}`}
-            href={tileUrl(zoom, x0 + c, y0 + r)}
-            x={c * size}
-            y={r * size}
-            width={size}
-            height={size}
-            preserveAspectRatio="none"
-          />
-        )),
+    <>
+      <g className="map__tiles" transform={`scale(${scale})`}>
+        {Array.from({ length: rows }).flatMap((_, r) =>
+          Array.from({ length: cols }).map((_, c) => {
+            const k = `${r}:${c}`
+            return (
+              <image
+                key={k}
+                className="map__tile"
+                data-loaded={settled[k] === 'loaded' || undefined}
+                href={tileUrl(zoom, x0 + c, y0 + r)}
+                x={c * size}
+                y={r * size}
+                width={size}
+                height={size}
+                preserveAspectRatio="none"
+                onLoad={() => mark(k, 'loaded')}
+                onError={() => mark(k, 'failed')}
+              />
+            )
+          }),
+        )}
+      </g>
+      {done < total && (
+        <text className="map__tiles-status" x={16} y={VIEW_H - 34}>
+          Loading map tiles {done}/{total}
+        </text>
       )}
-    </g>
+    </>
   )
 }

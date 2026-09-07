@@ -25,7 +25,7 @@ Two halves that share one world.
 
 **As a configurator** it opens parked in a seamless grey studio. Drag to look
 around the cabin from a fixed point between the front seats, scroll to tighten
-the framing, switch trims, or flip to an exterior turntable.
+the framing, change the interior colourway, or flip to an exterior turntable.
 
 ![The exterior turntable](docs/exterior-turntable.png)
 
@@ -151,7 +151,7 @@ Two details that took a second pass, invisible in a still and obvious in motion:
   subtraction the profile lifts the road out from under a camera pinned at eye
   height, and the scenery floats.
 
-![Night, on the ST trim](docs/night-st.png)
+![Night, on the ST Red Accent interior](docs/night-st.png)
 
 ---
 
@@ -188,10 +188,16 @@ handful of values that change every frame and are consumed only by the renderer,
 deliberately outside React.
 
 **`cars/`** — a vehicle is *data*. Five Explorer trims share one cabin package
-and override theme, powertrain and cluster skin. A genuinely different vehicle
-would be another registry entry that brings its own package; nothing downstream
-distinguishes the two, which is why the trim selector and a multi-car garage are
-the same mechanism.
+and override theme, powertrain and cluster skin. Finish is kept separate from the
+vehicle: `useCar()` merges the chosen interior colourway over the trim's base
+theme, so a colour change is a theme override rather than a different car. A
+genuinely different vehicle would be another registry entry that brings its own
+package, and nothing downstream would distinguish the two.
+
+An earlier build put a trim dropdown in the chrome. It was removed because the
+five trims differ only in colour and cluster skin here, so the control promised a
+choice the model could not honour. What replaced it is the thing that does change
+something you can see: the interior colourway.
 
 **Input arbitration** — keyboard and on-screen pedals both want to set `throttle`.
 They publish *intent* to `input/pedalIntent.ts` and exactly one arbiter turns
@@ -278,14 +284,35 @@ Honest list, worst first:
 
 | | |
 |---|---|
-| **Configurator** | Nodal interior pan and zoom, exterior turntable, five trims, animated transitions between all of it |
+| **Configurator** | Nodal interior pan and zoom, exterior turntable, five interior colourways, animated transitions between all of it |
 | **Powertrain** | Constant-power force curve, aero drag, rolling resistance, engine braking, ten-speed auto with drive-mode shift points, fuel burn, coolant warm-up |
 | **Lighting** | One continuous `timeOfDay` signal drives sky, sun arc, ambient, cabin light, street lamps, screen dimming and the headlight beam. No boolean night mode anywhere |
 | **Headlights** | Low and high beam with distinct reach and spread, Gaussian falloff, retroreflective markings that return more light than asphalt |
 | **Telltales** | Ten ISO 2575 symbols, severity colouring, fixed slots, one message line showing the worst active fault |
 | **Monitors** | Door-ajar, seatbelt, low fuel and overheat raise and clear themselves from signal state, with no fault injected |
 | **Navigation** | Live route progress from `world.distance`, a counting-down manoeuvre banner, animated zoom into a POI or junction rather than a screen change |
-| **Surround view** | Plan view with distance rings and sensor wedges, threat-ranked track list, eight-sector proximity bars, escalating alert, speed-availability gate |
+| **Surround view** | Plan view with distance rings and sensor wedges, one pedestrian crossing ahead of the bumper, threat-ranked alert, eight-sector proximity bars, speed-availability gate |
+| **Head unit** | Eight apps behind a vertical rail, with a climate and volume strip that persists across all of them |
+| **Audio** | A real WebAudio graph: three-band equaliser, bass boost, a balance and fade pad that genuinely pans, and speed-compensated volume that lifts the level against road speed on a curve |
+| **Steering wheel** | Twelve working switches on the two pads. Cruise set, resume and adjust, lane keeping, volume, track skip and lamps, each showing its effect on the cluster |
+| **Cruise control** | A proportional hold against a set speed, available above 30 km/h, cancelled by the brake the way the real system is |
+| **Live data** | Optional, off by default, no key required: internet radio from the Radio Browser directory and OpenStreetMap raster tiles. See [docs/live-data.md](docs/live-data.md) |
+
+### The head unit
+
+Eight apps behind a vertical rail. Every one reads only the signals it needs, so
+Audio can be developed without touching the vehicle bus at all, and Vehicle
+derives its tyre pressures from the same warning the cluster reads rather than
+from its own copy — the two cannot drift apart.
+
+| | |
+|---|---|
+| ![Home](docs/app-home.png) | ![Audio](docs/app-audio.png) |
+| Live cards for the things you would otherwise open an app to check | Sources, presets and transport, with delivered gain shown next to commanded |
+| ![Sound](docs/app-sound.png) | ![Vehicle](docs/app-vehicle.png) |
+| A real filter chain, and a pad because balance and fade are one spatial decision | Condition, trip and systems, read from the same signals as the cluster |
+| ![Navigation](docs/app-navigation.png) | ![Surround view](docs/app-surround.png) |
+| Route progress driven by `world.distance`, with optional live map tiles | One pedestrian crossing ahead, ranked by threat, pre-empting whatever was open |
 
 ---
 
@@ -305,6 +332,11 @@ in the app for the full list.
 From cold: <kbd>I</kbd>, then <kbd>.</kbd> three times to reach D, then hold
 <kbd>W</kbd>.
 
+Click the centre screen or the wheel hub to zoom into it; <kbd>Esc</kbd> or the
+bar at the bottom backs out again. Cruise control has no key deliberately: it
+lives on the left wheel pad, because that is where you would reach for it, and
+having to find the switch is part of what the model is demonstrating.
+
 ### The bench panel
 
 The panel on the right is an engineering harness — the equivalent of a bench rig
@@ -313,11 +345,15 @@ producing them. Everything it does goes through the same public store actions th
 rest of the app uses. It also runs five scripted scenarios, each narrating itself
 step by step.
 
+![The bench panel](docs/bench-panel.png)
+
 ### Design harness
 
 `#panels` renders the cluster and the head unit at 1:1 against a neutral ground.
 They are normally viewed at an angle, at arm's length, through a windscreen — the
 right place to judge glanceability and the wrong place to judge typography.
+
+![The cluster at 1:1](docs/panel-cluster.png)
 
 ---
 
@@ -366,10 +402,15 @@ layering, and the reasons for it, would not.
 
 - [x] Nodal interior camera, exterior turntable, animated pose transitions
 - [x] Explorer cabin and body, five data-driven trims
-- [x] Configurator chrome: trim selector, view toggle, focus transitions
-- [x] Cluster, infotainment, driving, lighting, warnings, surround view
+- [x] Configurator chrome: vehicle badge, interior colourways, view toggle, focus transitions
+- [x] Cluster, driving, lighting, warnings, surround view
+- [x] Eight-app head unit, WebAudio sound processing, working wheel switches, cruise
+- [x] Optional keyless live radio and map tiles
 - [ ] Cabin material pass: the greige fascia still reads a shade light against
       the reference, and the seats are barely in frame from the default pose
+- [ ] Loft the door cards, console and seats the way the dash was done. This is
+      the next real modelling step and the one that most limits how close the
+      cabin gets to the reference
 - [ ] Head-up display projected on the windscreen
 - [ ] Adaptive cruise with a lead vehicle and following-distance UI
 - [ ] Recorded signal traces: replay a drive from a log instead of live input

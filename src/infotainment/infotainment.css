@@ -16,6 +16,21 @@
   --map-water: #14304d;
   --map-route-dim: #253044;
 
+  /* Three radii, not eight. The file had grown 10/12/14/16px card corners that
+     differed by two pixels each, which reads as ad hoc rather than designed.
+     Bars and meters keep a hairline rounding; everything card-shaped shares one
+     value; anything pill-shaped is fully round. */
+  --r-hair: 3px;
+  --r-card: 14px;
+  --r-pill: 999px;
+
+  /* One curve and two durations. A bare `ease` is the browser's default rather
+     than a decision, and it is the wrong shape for a control that should settle
+     quickly under a moving finger. */
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur: 140ms;
+  --dur-slow: 420ms;
+
   width: 100%;
   height: 100%;
   box-sizing: border-box;
@@ -46,7 +61,7 @@
 .ivi__spacer { flex: 1; }
 .ivi__mode { color: var(--accent); font-weight: 700; letter-spacing: 0.14em; font-size: 12px; }
 .ivi__signal { display: flex; align-items: flex-end; gap: 2px; height: 15px; }
-.ivi__signal i { width: 3px; background: currentColor; border-radius: 2px; }
+.ivi__signal i { width: 3px; background: currentColor; border-radius: var(--r-hair); }
 .ivi__status time { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
 
 /* ---------- stage ---------- */
@@ -66,7 +81,7 @@
   letter-spacing: 0.04em;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 420ms ease;
+  transition: opacity var(--dur-slow) var(--ease);
   z-index: 5;
 }
 .ivi__nudge small { font-size: 14px; color: var(--ink-dim); font-weight: 400; }
@@ -102,7 +117,7 @@
   color: var(--ink-dim);
   cursor: pointer;
   border-left: 3px solid transparent;
-  transition: color 140ms, background 140ms, border-color 140ms;
+  transition: color var(--dur) var(--ease), background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 .rail__item:hover { background: var(--panel-2); color: var(--ink); }
 .rail__item[data-active] { color: var(--accent); border-left-color: var(--accent); background: var(--panel-2); }
@@ -127,11 +142,11 @@
   height: 46px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: var(--r-card);
   background: var(--panel-2);
   font-size: 19px;
   cursor: pointer;
-  transition: background 130ms;
+  transition: background var(--dur) var(--ease);
 }
 .strip__btn:hover { background: #232b38; }
 .strip__btn[data-on] { background: var(--accent); color: #0b0d10; }
@@ -139,23 +154,23 @@
 .strip__bar {
   all: unset;
   width: 10px;
-  border-radius: 3px 3px 2px 2px;
+  border-radius: var(--r-hair) var(--r-hair) 1px 1px;
   background: var(--panel-2);
   cursor: pointer;
-  transition: background 130ms;
+  transition: background var(--dur) var(--ease);
 }
 .strip__bar[data-on] { background: var(--accent); }
 .strip__pill {
   all: unset;
   min-height: 42px;
   padding: 0 18px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border: 1px solid var(--line);
   font-size: 14px;
   font-weight: 600;
   color: var(--ink-dim);
   cursor: pointer;
-  transition: all 140ms;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .strip__pill:hover { color: var(--ink); border-color: #3b4351; }
 
@@ -167,13 +182,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   background: var(--panel-2);
   color: var(--ink);
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 130ms, transform 90ms;
+  transition: background var(--dur) var(--ease), transform 90ms var(--ease);
 }
 .btn:hover { background: #232b38; }
 .btn:active { transform: scale(0.97); }
@@ -186,7 +201,7 @@
   all: unset;
   min-height: 46px;
   padding: 0 20px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border: 1px solid var(--line);
   display: inline-flex;
   align-items: center;
@@ -194,7 +209,7 @@
   font-weight: 600;
   color: var(--ink-dim);
   cursor: pointer;
-  transition: all 140ms;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .chip[data-active] { background: var(--accent); border-color: var(--accent); color: #0b0d10; }
 
@@ -225,7 +240,7 @@
 
 .poi { cursor: pointer; }
 .poi__hit { fill: transparent; }
-.poi__dot { fill: var(--ink); stroke: #0b0d10; stroke-width: 2; transition: fill 160ms; }
+.poi__dot { fill: var(--ink); stroke: #0b0d10; stroke-width: 2; transition: fill var(--dur) var(--ease); }
 .poi[data-active] .poi__dot, .poi:hover .poi__dot { fill: var(--accent); }
 
 .map__car-halo { fill: var(--accent); opacity: 0.2; }
@@ -236,7 +251,7 @@
   bottom: 22px;
   width: 340px;
   padding: 18px;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   background: rgb(20 25 34 / 0.95);
   border: 1px solid var(--line);
   display: flex;
@@ -245,7 +260,7 @@
   opacity: 0;
   transform: translateY(14px);
   pointer-events: none;
-  transition: opacity 280ms ease, transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition: opacity 280ms var(--ease), transform 280ms var(--ease);
 }
 .map__card[data-open] { opacity: 1; transform: none; pointer-events: auto; }
 .map__card-cat { font-size: 12px; letter-spacing: 0.16em; color: var(--accent); font-weight: 700; }
@@ -261,7 +276,7 @@
   top: 18px;
   min-height: 48px;
   padding: 0 18px;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   background: rgb(20 25 34 / 0.92);
   border: 1px solid var(--line);
   font-size: 15px;
@@ -295,15 +310,15 @@
 .msg__thread-body strong { font-size: 16px; }
 .msg__thread-body small { font-size: 13px; color: var(--ink-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 .msg__thread-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; font-size: 12px; color: var(--ink-dim); }
-.msg__badge { background: var(--accent); color: #0b0d10; font-style: normal; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 7px; }
+.msg__badge { background: var(--accent); color: #0b0d10; font-style: normal; font-size: 11px; font-weight: 700; border-radius: var(--r-pill); padding: 1px 7px; }
 
 .msg__pane { display: flex; flex-direction: column; min-width: 0; }
 .msg__header { height: 62px; flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid var(--line); }
 .msg__header strong { font-size: 18px; }
 .msg__header .btn { min-height: 44px; font-size: 14px; }
 .msg__scroll { flex: 1; overflow-y: auto; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
-.msg__bubble { max-width: 74%; align-self: flex-start; background: var(--panel); border-radius: 14px 14px 14px 4px; padding: 12px 16px; }
-.msg__bubble[data-mine] { align-self: flex-end; background: color-mix(in srgb, var(--accent) 22%, var(--panel)); border-radius: 14px 14px 4px 14px; }
+.msg__bubble { max-width: 74%; align-self: flex-start; background: var(--panel); border-radius: var(--r-card) 14px 14px 4px; padding: 12px 16px; }
+.msg__bubble[data-mine] { align-self: flex-end; background: color-mix(in srgb, var(--accent) 22%, var(--panel)); border-radius: var(--r-card) 14px 4px 14px; }
 .msg__bubble p { margin: 0; font-size: 16px; line-height: 1.35; }
 .msg__bubble time { display: block; margin-top: 5px; font-size: 11px; color: var(--ink-dim); }
 
@@ -313,7 +328,7 @@
 .msg__quick .btn { font-size: 15px; padding: 0 18px; }
 .msg__input-row { display: flex; gap: 12px; }
 .msg__input-row input {
-  flex: 1; min-height: 56px; border-radius: 14px; border: 1px solid var(--line);
+  flex: 1; min-height: 56px; border-radius: var(--r-card); border: 1px solid var(--line);
   background: var(--panel); color: var(--ink); padding: 0 16px; font-size: 16px; font-family: inherit;
 }
 .msg__input-row input:focus { outline: 2px solid var(--accent); outline-offset: -2px; }
@@ -331,19 +346,19 @@
   width: 68px; height: 68px; border-radius: 50%;
   display: grid; place-items: center;
   background: var(--panel-2); font-size: 30px; cursor: pointer;
-  transition: background 130ms, transform 90ms;
+  transition: background var(--dur) var(--ease), transform 90ms var(--ease);
 }
 .climate__step:hover { background: #232b38; }
 .climate__step:active { transform: scale(0.94); }
 
 .climate__seat {
   all: unset; display: flex; align-items: center; gap: 10px;
-  min-height: 50px; padding: 0 18px; border-radius: 14px;
+  min-height: 50px; padding: 0 18px; border-radius: var(--r-card);
   border: 1px solid var(--line); font-size: 14px; color: var(--ink-dim); cursor: pointer;
 }
 .climate__seat[data-level] { color: var(--accent); border-color: var(--accent); }
 .climate__seat-bars { display: flex; gap: 3px; }
-.climate__seat-bars i { width: 5px; height: 14px; border-radius: 2px; background: var(--line); }
+.climate__seat-bars i { width: 5px; height: 14px; border-radius: var(--r-hair); background: var(--line); }
 .climate__seat-bars i[data-on] { background: var(--accent); }
 
 .climate__centre { display: flex; flex-direction: column; gap: 10px; }
@@ -351,9 +366,9 @@
   all: unset;
   min-width: 116px; min-height: 56px;
   display: grid; place-items: center;
-  border-radius: 14px; border: 1px solid var(--line);
+  border-radius: var(--r-card); border: 1px solid var(--line);
   font-size: 15px; font-weight: 600; color: var(--ink-dim); cursor: pointer;
-  transition: all 140ms;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .climate__ac[data-on] { background: var(--accent); border-color: var(--accent); color: #0b0d10; }
 
@@ -362,8 +377,8 @@
 .climate__fan-label { font-size: 13px; letter-spacing: 0.16em; color: var(--ink-dim); font-weight: 700; padding-bottom: 6px; }
 .climate__fan-bars { display: flex; align-items: flex-end; gap: 10px; flex: 1; max-width: 520px; }
 .climate__fan-bar {
-  all: unset; flex: 1; border-radius: 4px 4px 2px 2px;
-  background: var(--panel-2); cursor: pointer; transition: background 130ms;
+  all: unset; flex: 1; border-radius: var(--r-hair) var(--r-hair) 1px 1px;
+  background: var(--panel-2); cursor: pointer; transition: background var(--dur) var(--ease);
 }
 .climate__fan-bar[data-on] { background: var(--accent); }
 .climate__fan-value { font-size: 26px; font-weight: 600; min-width: 30px; text-align: right; }
@@ -392,7 +407,7 @@
   gap: 2px;
   padding: 0 24px;
   border-bottom: 1px solid var(--line);
-  transition: background 160ms, color 160ms;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .adas__banner strong { font-size: 19px; letter-spacing: 0.06em; }
 .adas__banner span { font-size: 14px; color: var(--ink-dim); }
@@ -435,7 +450,7 @@
 .adas__car-glass { fill: #16202e; }
 .adas__car-lamp { fill: #ffe9c0; }
 
-.blip { transition: opacity 180ms; }
+.blip { transition: opacity 180ms var(--ease); }
 .blip__halo { fill: #6fd3ff; opacity: 0.18; }
 .blip__dot { fill: #6fd3ff; stroke: #0b0d10; stroke-width: 2; }
 .blip__arrow { fill: #6fd3ff; }
@@ -461,7 +476,10 @@
 .adas__row[data-level='info'] { fill: #6fd3ff; }
 .adas__row[data-level='caution'] { fill: #ffb02e; }
 .adas__row[data-level='critical'] { fill: #ff4438; font-weight: 700; }
-.adas__sector-bar { fill: #6fd3ff; transition: width 160ms linear, fill 160ms; }
+/* Linear on purpose: this bar tracks a continuously measured distance, and
+   easing it would make the signal look like it accelerates when it does not.
+   Colour, which is a state change rather than a measurement, gets the curve. */
+.adas__sector-bar { fill: #6fd3ff; transition: width 160ms linear, fill var(--dur) var(--ease); }
 .adas__sector-bar[data-level='none'] { fill: #1a2331; }
 .adas__sector-bar[data-level='caution'] { fill: #ffb02e; }
 .adas__sector-bar[data-level='critical'] { fill: #ff4438; }
@@ -478,11 +496,11 @@
   gap: 3px;
   min-height: 108px;
   padding: 14px 16px;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   border: 1px solid var(--line);
   background: var(--panel);
   cursor: pointer;
-  transition: border-color 140ms, background 140ms;
+  transition: border-color var(--dur) var(--ease), background var(--dur) var(--ease);
 }
 .hcard:hover { border-color: #3b4351; background: var(--panel-2); }
 .hcard--nav { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
@@ -498,11 +516,11 @@
   gap: 5px;
   min-height: 104px;
   padding: 14px;
-  border-radius: 14px;
+  border-radius: var(--r-card);
   background: var(--panel);
   color: var(--ink-dim);
   cursor: pointer;
-  transition: background 140ms, color 140ms;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .htile:hover { background: var(--panel-2); color: var(--ink); }
 .htile strong { font-size: 15px; color: var(--ink); font-weight: 600; }
@@ -519,7 +537,7 @@
   width: 168px;
   height: 168px;
   flex: none;
-  border-radius: 16px;
+  border-radius: var(--r-card);
   display: flex;
   align-items: flex-end;
   padding: 14px;
@@ -545,7 +563,7 @@
   box-sizing: border-box;
   min-height: 58px;
   padding: 8px 14px;
-  border-radius: 12px;
+  border-radius: var(--r-card);
   border: 1px solid var(--line);
   background: var(--panel-2);
   display: flex;
@@ -553,7 +571,7 @@
   justify-content: center;
   gap: 2px;
   cursor: pointer;
-  transition: background 140ms ease, border-color 140ms ease;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
 }
 .preset strong { font-size: 16px; font-weight: 650; color: var(--ink); font-variant-numeric: tabular-nums; }
 .preset span { font-size: 12px; color: var(--ink-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -567,7 +585,7 @@
 .audio__volume-value { min-width: 32px; text-align: right; color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 .audio__volume-lift { color: var(--accent); font-weight: 600; font-size: 12px; }
 
-.sound__block { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--panel); }
+.sound__block { border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px; background: var(--panel); }
 .sound__block h3 { margin: 0 0 10px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
 .sound__note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.45; color: var(--ink-dim); }
 .sound__slider { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; font-size: 13px; }
@@ -581,7 +599,7 @@
 .sound__pad {
   position: relative;
   height: 168px;
-  border-radius: 12px;
+  border-radius: var(--r-card);
   border: 1px solid var(--line);
   background: var(--map-bg);
   cursor: crosshair;
@@ -615,13 +633,13 @@
 .vehicle { height: 100%; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
 .vehicle__tabs { display: flex; gap: 10px; flex: none; }
 .vehicle__pane { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; }
-.vcard { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--panel); }
+.vcard { border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px; background: var(--panel); }
 .vcard--wide { grid-column: 1 / -1; }
 .vcard h3 { margin: 0 0 12px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
 .vcard__note { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-dim); }
 
 .tyres { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.tyre { display: flex; align-items: baseline; gap: 6px; padding: 10px 12px; border-radius: 10px; background: var(--panel-2); }
+.tyre { display: flex; align-items: baseline; gap: 6px; padding: 10px 12px; border-radius: var(--r-card); background: var(--panel-2); }
 .tyre__pos { font-size: 11px; letter-spacing: 0.12em; color: var(--ink-dim); font-weight: 700; min-width: 22px; }
 .tyre strong { font-size: 22px; font-variant-numeric: tabular-nums; }
 .tyre small { font-size: 11px; color: var(--ink-dim); }
@@ -630,13 +648,13 @@
 
 .meter { display: flex; align-items: center; gap: 12px; margin-bottom: 9px; font-size: 13px; }
 .meter span { min-width: 92px; color: var(--ink-dim); }
-.meter__track { flex: 1; height: 8px; border-radius: 3px; background: var(--panel-2); overflow: hidden; }
-.meter__track i { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+.meter__track { flex: 1; height: 8px; border-radius: var(--r-hair); background: var(--panel-2); overflow: hidden; }
+.meter__track i { display: block; height: 100%; background: var(--accent); border-radius: var(--r-hair); }
 .meter__track i[data-warn] { background: #ffb02e; }
 .meter b { min-width: 52px; text-align: right; font-variant-numeric: tabular-nums; }
 
 .closures { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.closure { display: flex; justify-content: space-between; padding: 9px 12px; border-radius: 10px; background: var(--panel-2); font-size: 13px; }
+.closure { display: flex; justify-content: space-between; padding: 9px 12px; border-radius: var(--r-card); background: var(--panel-2); font-size: 13px; }
 .closure span { color: var(--ink-dim); }
 .closure[data-open] { background: rgb(255 68 56 / 0.14); }
 .closure[data-open] strong { color: #ff4438; }
@@ -657,10 +675,10 @@
   flex-direction: column;
   gap: 4px;
   padding: 14px;
-  border-radius: 12px;
+  border-radius: var(--r-card);
   border: 1px solid var(--line);
   cursor: pointer;
-  transition: all 140ms;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 }
 .modebtn:hover { background: var(--panel-2); }
 .modebtn[data-active] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--panel)); }
@@ -685,7 +703,7 @@
 .assistrow__state {
   flex: none;
   padding: 5px 14px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border: 1px solid var(--line);
   font-size: 12px;
   font-weight: 700;
@@ -727,7 +745,7 @@
   height: 60px;
   display: grid;
   place-items: center;
-  border-radius: 12px;
+  border-radius: var(--r-card);
   background: var(--panel-2);
   font-size: 24px;
   cursor: pointer;
@@ -744,7 +762,7 @@
 
 /* ---------- settings ---------- */
 .settings { height: 100%; padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; overflow-y: auto; }
-.scard { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--panel); }
+.scard { border: 1px solid var(--line); border-radius: var(--r-card); padding: 16px; background: var(--panel); }
 .scard h3 { margin: 0 0 10px; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-dim); }
 .scard__note { margin: 0 0 12px; font-size: 12.5px; line-height: 1.5; color: var(--ink-dim); }
 .scard__error { margin: 10px 0 0; font-size: 12.5px; color: #ffb02e; }
@@ -763,7 +781,7 @@
 .settings__row:last-of-type { border-bottom: none; }
 .settings__row strong { display: block; font-size: 14.5px; }
 .settings__row small { font-size: 12px; color: var(--ink-dim); }
-.settings__state { flex: none; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line); font-size: 12px; font-weight: 700; color: var(--ink-dim); }
+.settings__state { flex: none; padding: 5px 14px; border-radius: var(--r-pill); border: 1px solid var(--line); font-size: 12px; font-weight: 700; color: var(--ink-dim); }
 .settings__state[data-on] { background: var(--accent); border-color: var(--accent); color: #0b0d10; }
 .settings__swatches { display: flex; flex-wrap: wrap; gap: 8px; }
 .settings__swatch {
@@ -772,7 +790,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: 999px;
+  border-radius: var(--r-pill);
   border: 1px solid var(--line);
   font-size: 12.5px;
   color: var(--ink-dim);
@@ -795,5 +813,11 @@
   color: var(--ink-dim);
   background: rgb(11 14 19 / 0.7);
   padding: 2px 7px;
-  border-radius: 4px;
+  border-radius: var(--r-hair);
 }
+
+/* Tiles fade in as they arrive rather than popping, and one that never arrives
+   stays transparent so the drawn vector map underneath carries the view. */
+.map__tile { opacity: 0; transition: opacity 260ms var(--ease); }
+.map__tile[data-loaded] { opacity: 0.85; }
+.map__tiles-status { fill: var(--ink-dim); font-size: 13px; font-variant-numeric: tabular-nums; }

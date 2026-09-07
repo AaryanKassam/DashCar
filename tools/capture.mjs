@@ -51,12 +51,19 @@ async function pullAway(page) {
   await key(page, 'w')
 }
 
-const pickTrim = async (page, name) => {
-  await page.click('.trim__trigger')
-  await page.waitForTimeout(400)
+/**
+ * Pick an interior colourway from the bench panel.
+ *
+ * This replaced a trim dropdown that no longer exists. The five trims differed
+ * only in colour, so the control was removed in favour of the one that changes
+ * something visible; the capture follows the app rather than the other way round.
+ */
+const pickInterior = async (page, name) => {
   await page.evaluate((n) => {
-    const options = [...document.querySelectorAll('.trim__option')]
-    ;(options.find((o) => o.querySelector('.trim__option-name')?.textContent?.trim() === n) ?? options[0]).click()
+    const cards = [...document.querySelectorAll('.debug__swatch')]
+    const match = cards.find((c) =>
+      c.querySelector('.debug__swatch-label')?.textContent?.trim().startsWith(n))
+    ;(match ?? cards[0]).click()
   }, name)
   await page.waitForTimeout(1400)
 }
@@ -90,14 +97,14 @@ async function captureDocs() {
   await page.keyboard.press('Escape')
   await page.waitForTimeout(1500)
 
-  // Night drive on the ST trim, which is where the red ambient lives.
+  // Night drive on the ST Red Accent interior, where the red ambient lives.
   await pullAway(page)
   await page.waitForTimeout(5200)
   await key(page, 't')
   await key(page, 't')
   await key(page, 'l')
   await page.waitForTimeout(2600)
-  await pickTrim(page, 'Explorer® ST')
+  await pickInterior(page, 'ST Red Accent')
   await page.waitForTimeout(1600)
   await page.screenshot({ path: `${OUT}/night-st.png` })
 
@@ -107,7 +114,7 @@ async function captureDocs() {
   await page.waitForTimeout(5000)
   await key(page, 's', 'keyup')
   await key(page, 't')
-  await pickTrim(page, 'Explorer® Active')
+  await pickInterior(page, 'Ebony / Medium Grey')
   await page.click('.debug__toggle')
   await page.waitForTimeout(600)
   await page.evaluate(() => {
@@ -126,11 +133,21 @@ async function capturePanels() {
   const ivi = page.locator('.ivi')
 
   await page.locator('.cluster').screenshot({ path: `${OUT}/panel-cluster.png` })
-  for (const [i, name] of ['map', 'media', 'messages', 'climate'].entries()) {
-    await page.locator('.dock__item').nth(i).click()
+  // Rail order matches APPS in the registry.
+  const apps = ['home', 'navigation', 'audio', 'phone', 'messages', 'climate', 'vehicle', 'settings']
+  for (const [i, name] of apps.entries()) {
+    await page.locator('.rail__item').nth(i).click()
     await page.waitForTimeout(900)
     await ivi.screenshot({ path: `${OUT}/app-${name}.png` })
   }
+
+  // The sound pane, which is where the audio processing is actually exposed.
+  await page.locator('.rail__item').nth(2).click()
+  await page.waitForTimeout(400)
+  await page.evaluate(() =>
+    [...document.querySelectorAll('.audio__tabs .chip')].find((b) => b.textContent === 'Sound').click())
+  await page.waitForTimeout(800)
+  await ivi.screenshot({ path: `${OUT}/app-sound.png` })
 
   await page.evaluate(() => window.__toggleSurround?.())
   await page.waitForTimeout(4000)
@@ -197,27 +214,22 @@ async function captureCamera() {
   await page.screenshot({ path: `${OUT}/cam-focus-cluster.png` })
 }
 
-async function captureTrims() {
+async function captureInteriors() {
   const page = await newPage(1700, 940)
   await page.goto(BASE, { waitUntil: 'networkidle' })
   await page.waitForTimeout(2400)
   await page.click('.debug__toggle')
 
-  const names = await page.evaluate(async () => {
-    document.querySelector('.trim__trigger').click()
-    await new Promise((r) => setTimeout(r, 300))
-    const list = [...document.querySelectorAll('.trim__option-name')].map((n) => n.textContent.trim())
-    document.querySelector('.trim__trigger').click()
-    return list
-  })
+  const names = await page.evaluate(() =>
+    [...document.querySelectorAll('.debug__swatch-label')].map((n) => n.textContent.trim()))
 
   for (const [i, name] of names.entries()) {
-    await pickTrim(page, name)
-    await page.screenshot({ path: `${OUT}/trim-${i + 1}.png` })
+    await pickInterior(page, name)
+    await page.screenshot({ path: `${OUT}/interior-${i + 1}.png` })
   }
 }
 
-const modes = { docs: captureDocs, panels: capturePanels, camera: captureCamera, trims: captureTrims }
+const modes = { docs: captureDocs, panels: capturePanels, camera: captureCamera, interiors: captureInteriors }
 const run = modes[MODE]
 if (!run) {
   console.error(`Unknown mode "${MODE}". Expected one of: ${Object.keys(modes).join(', ')}`)
